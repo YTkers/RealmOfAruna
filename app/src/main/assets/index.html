@@ -2,8 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
 <title>Realm Of Aruna</title>
 
@@ -12,6 +11,7 @@
     box-sizing:border-box;
     user-select:none;
     -webkit-user-select:none;
+    -webkit-touch-callout:none;
     touch-action:none;
 }
 
@@ -21,8 +21,8 @@ html,body{
     height:100%;
     overflow:hidden;
     background:#07101c;
-    font-family:Arial,sans-serif;
-    color:white;
+    font-family:"Arial Black",Arial,sans-serif;
+    color:#fff;
 }
 
 #game{
@@ -39,6 +39,15 @@ canvas{
     height:100%;
 }
 
+button{
+    font-family:"Arial Black",Arial,sans-serif;
+    color:#fff;
+    font-weight:900;
+    border:2px solid #fff;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+}
+
 #topUI{
     position:absolute;
     top:8px;
@@ -51,7 +60,7 @@ canvas{
 }
 
 .panel{
-    background:rgba(3,10,24,.88);
+    background:rgba(3,10,24,.9);
     border:2px solid #55dfff;
     border-radius:12px;
     padding:8px 11px;
@@ -75,7 +84,7 @@ canvas{
     margin-top:4px;
     border-radius:10px;
     background:#401722;
-    border:1px solid white;
+    border:1px solid #fff;
     overflow:hidden;
 }
 
@@ -90,16 +99,18 @@ canvas{
     top:92px;
     left:50%;
     transform:translateX(-50%);
-    z-index:30;
+    z-index:40;
     padding:9px 15px;
     border-radius:12px;
     border:2px solid #ffe05c;
-    background:rgba(0,0,0,.88);
+    background:rgba(0,0,0,.9);
+    color:#fff;
     font-weight:900;
     text-align:center;
     opacity:0;
     transition:.2s;
     pointer-events:none;
+    white-space:nowrap;
 }
 
 #message.show{
@@ -108,14 +119,15 @@ canvas{
 
 #joystick{
     position:absolute;
-    left:22px;
-    bottom:22px;
+    left:20px;
+    bottom:20px;
     width:125px;
     height:125px;
     border-radius:50%;
-    background:rgba(65,105,145,.35);
+    background:rgba(50,120,180,.38);
     border:3px solid #8cecff;
     z-index:30;
+    box-shadow:0 0 20px #19cfff55;
 }
 
 #knob{
@@ -126,34 +138,32 @@ canvas{
     top:50%;
     transform:translate(-50%,-50%);
     border-radius:50%;
-    background:#42cfff;
-    border:3px solid white;
+    background:radial-gradient(circle,#8ff4ff,#159ad4);
+    border:3px solid #fff;
     box-shadow:0 0 18px #20caff;
 }
 
 #buttons{
     position:absolute;
-    right:12px;
-    bottom:18px;
+    right:10px;
+    bottom:16px;
     z-index:30;
     display:flex;
     align-items:flex-end;
     gap:7px;
 }
 
-button{
-    font-family:Arial,sans-serif;
-    color:white;
-    font-weight:900;
-    border:2px solid white;
+#attack{
+    width:84px;
+    height:84px;
+    border-radius:50%;
+    background:radial-gradient(circle,#ffe76b,#ff8b19 55%,#db251e);
+    box-shadow:0 5px 15px #0009,0 0 18px #ff722955;
+    font-size:12px;
 }
 
-#attack{
-    width:82px;
-    height:82px;
-    border-radius:50%;
-    background:radial-gradient(circle,#ffc64e,#e3341e);
-    box-shadow:0 5px 15px #0009;
+#attack:active{
+    transform:scale(.92);
 }
 
 .skills{
@@ -162,12 +172,17 @@ button{
 }
 
 .skill{
-    width:58px;
-    height:58px;
+    width:60px;
+    height:60px;
     border-radius:13px;
     background:linear-gradient(#784cff,#28185f);
     position:relative;
-    font-size:22px;
+    font-size:23px;
+    box-shadow:0 4px 10px #0008;
+}
+
+.skill:active{
+    transform:scale(.9);
 }
 
 .skill b{
@@ -183,7 +198,84 @@ button{
     left:0;
     right:0;
     text-align:center;
+    font-size:9px;
+    color:#fff;
+}
+
+#weaponInfo{
+    position:absolute;
+    left:10px;
+    bottom:155px;
+    z-index:25;
+    padding:8px 10px;
+    border-radius:10px;
+    border:2px solid #ffc84a;
+    background:rgba(5,12,27,.9);
+    color:#fff;
+    font-size:11px;
+    max-width:190px;
+}
+
+#shopToggle,
+#skillBookToggle{
+    position:absolute;
+    right:10px;
+    z-index:35;
+    width:105px;
+    padding:8px;
+    border-radius:10px;
+    background:linear-gradient(#ffbd32,#b85b00);
+    font-size:11px;
+}
+
+#shopToggle{
+    top:120px;
+}
+
+#skillBookToggle{
+    top:164px;
+    background:linear-gradient(#a25cff,#4420a5);
+}
+
+#shop,
+#skillBook{
+    position:absolute;
+    right:10px;
+    top:205px;
+    width:245px;
+    max-height:55vh;
+    overflow-y:auto;
+    z-index:45;
+    display:none;
+    padding:10px;
+    border-radius:12px;
+    border:2px solid #ffd54d;
+    background:rgba(4,10,25,.96);
+    color:#fff;
+}
+
+#skillBook{
+    border-color:#bb7cff;
+}
+
+.shopItem,
+.skillItem{
+    width:100%;
+    padding:8px;
+    margin-top:5px;
+    border-radius:8px;
+    background:#243b63;
+    text-align:left;
     font-size:10px;
+}
+
+.skillItem{
+    background:#422477;
+}
+
+.shopItem:active,
+.skillItem:active{
+    transform:scale(.97);
 }
 
 #overlay{
@@ -193,29 +285,30 @@ button{
     display:flex;
     align-items:center;
     justify-content:center;
-    background:radial-gradient(circle,#18385e88,#020711f5);
+    background:radial-gradient(circle,#18385eaa,#020711f7);
 }
 
 #menu{
-    width:min(420px,90%);
-    padding:26px;
+    width:min(430px,90%);
+    padding:25px;
     border:2px solid #58dcff;
     border-radius:22px;
-    background:#071225f2;
+    background:#071225f5;
     text-align:center;
-    box-shadow:0 0 35px #25caff33;
+    box-shadow:0 0 35px #25caff55;
 }
 
 #menu h1{
     margin:0;
     color:#70eaff;
-    font-size:36px;
+    font-size:34px;
     text-shadow:0 0 14px #159cff;
 }
 
 #menu p{
-    color:#d9f7ff;
+    color:#f2fcff;
     line-height:1.5;
+    font-size:13px;
 }
 
 .menuBtn{
@@ -224,35 +317,25 @@ button{
     margin-top:9px;
     border-radius:12px;
     background:linear-gradient(90deg,#257cff,#9b36ff);
-    font-size:17px;
+    font-size:16px;
+}
+
+.menuBtn:active{
+    transform:scale(.97);
 }
 
 #restart{
     display:none;
 }
 
-#shop{
-    position:absolute;
-    right:10px;
-    top:120px;
-    width:200px;
-    z-index:25;
-    display:none;
-    padding:10px;
-    border-radius:12px;
-    border:2px solid #ffd54d;
-    background:#071225ed;
-}
-
-.shopItem{
-    width:100%;
-    padding:7px;
-    margin-top:4px;
-    border-radius:8px;
-    background:#243b63;
+#hint{
+    color:#8feaff;
+    font-size:11px;
+    margin-top:12px;
 }
 
 @media(max-width:600px){
+
     #joystick{
         width:115px;
         height:115px;
@@ -264,8 +347,9 @@ button{
     }
 
     .skill{
-        width:54px;
-        height:54px;
+        width:53px;
+        height:53px;
+        font-size:20px;
     }
 
     #attack{
@@ -275,6 +359,17 @@ button{
 
     #hpbar{
         width:130px;
+    }
+
+    #weaponInfo{
+        bottom:145px;
+        font-size:9px;
+        max-width:150px;
+    }
+
+    #shop,
+    #skillBook{
+        width:220px;
     }
 }
 </style>
@@ -287,38 +382,36 @@ button{
 <canvas id="canvas"></canvas>
 
 <div id="topUI">
-
     <div class="panel">
-
-        <div id="title">
-            ⚔ REALM OF ARUNA
-        </div>
-
-        <div class="small" id="mapText">
-            Map 1 — Verdant Plains
-        </div>
-
-        <div class="small">
-            ❤️ <span id="hpText">100/100</span>
-        </div>
-
-        <div id="hpbar">
-            <div id="hpfill"></div>
-        </div>
-
+        <div id="title">⚔ REALM OF ARUNA</div>
+        <div class="small" id="mapText">Map 1 — Verdant Plains</div>
+        <div class="small">❤️ <span id="hpText">100/100</span></div>
+        <div id="hpbar"><div id="hpfill"></div></div>
     </div>
 
     <div class="panel">
         💰 <span id="gold">150</span>
     </div>
-
 </div>
 
 <div id="message"></div>
 
+<div id="weaponInfo">
+    ⚔ <b id="weaponName">Wood Sword</b><br>
+    Damage: <span id="weaponDamage">8</span>
+</div>
+
+<button id="shopToggle">🛒 WEAPON</button>
+<button id="skillBookToggle">📖 SKILLS</button>
+
 <div id="shop">
-    <b>🧙 WEAPON SHOP</b>
+    <b>⚔ WEAPON SHOP</b>
     <div id="shopItems"></div>
+</div>
+
+<div id="skillBook">
+    <b>📖 SKILL BOOK — 20 SKILLS</b>
+    <div id="skillItems"></div>
 </div>
 
 <div id="joystick">
@@ -328,7 +421,6 @@ button{
 <div id="buttons">
 
     <div class="skills">
-
         <button class="skill" id="skill0">
             <b>1</b>🔥
             <span class="cooldown">READY</span>
@@ -343,25 +435,18 @@ button{
             <b>3</b>❄️
             <span class="cooldown">READY</span>
         </button>
-
     </div>
 
-    <button id="attack">
-        ATTACK
-    </button>
-
+    <button id="attack">⚔<br>ATTACK</button>
 </div>
 
 <div id="overlay">
-
     <div id="menu">
 
-        <h1>
-            REALM OF ARUNA
-        </h1>
+        <h1>REALM OF ARUNA</h1>
 
         <p id="menuText">
-            Defeat the enemies, miniboss and boss.
+            Defeat enemies, miniboss and boss.
             Open the portal and continue to the next realm.
         </p>
 
@@ -373,66 +458,150 @@ button{
             🔄 RESTART GAME
         </button>
 
-    </div>
+        <div id="hint">
+            Gunakan analog kiri untuk bergerak.
+            Tombol ATTACK untuk menyerang.
+        </div>
 
+    </div>
 </div>
 
 </div>
 
 <script>
-
 "use strict";
 
 /* =========================================================
    CANVAS
 ========================================================= */
 
-const canvas =
-document.getElementById("canvas");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
 
-const ctx =
-canvas.getContext("2d");
-
-let W = 0;
-let H = 0;
+let W=innerWidth;
+let H=innerHeight;
+let DPR=Math.max(1,Math.min(2,devicePixelRatio||1));
 
 function resize(){
+    W=innerWidth;
+    H=innerHeight;
+    DPR=Math.max(1,Math.min(2,devicePixelRatio||1));
 
-    W = canvas.width =
-        window.innerWidth * devicePixelRatio;
+    canvas.width=W*DPR;
+    canvas.height=H*DPR;
+    canvas.style.width=W+"px";
+    canvas.style.height=H+"px";
 
-    H = canvas.height =
-        window.innerHeight * devicePixelRatio;
-
-    canvas.style.width =
-        window.innerWidth + "px";
-
-    canvas.style.height =
-        window.innerHeight + "px";
-
-    ctx.setTransform(
-        devicePixelRatio,
-        0,
-        0,
-        devicePixelRatio,
-        0,
-        0
-    );
+    ctx.setTransform(DPR,0,0,DPR,0,0);
 }
 
-window.addEventListener(
-    "resize",
-    resize
-);
-
+addEventListener("resize",resize);
 resize();
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+let audioCtx=null;
+
+function initAudio(){
+    try{
+        if(!audioCtx){
+            audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+        }
+
+        if(audioCtx.state==="suspended"){
+            audioCtx.resume();
+        }
+    }catch(e){}
+}
+
+function sound(type){
+    if(!audioCtx) return;
+
+    try{
+        const osc=audioCtx.createOscillator();
+        const gain=audioCtx.createGain();
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now=audioCtx.currentTime;
+
+        let f1=300;
+        let f2=100;
+        let duration=.12;
+
+        if(type==="attack"){
+            f1=180;
+            f2=80;
+            duration=.1;
+        }
+
+        if(type==="fire"){
+            f1=160;
+            f2=700;
+            duration=.2;
+        }
+
+        if(type==="lightning"){
+            f1=800;
+            f2=130;
+            duration=.18;
+        }
+
+        if(type==="ice"){
+            f1=900;
+            f2=500;
+            duration=.22;
+        }
+
+        if(type==="magic"){
+            f1=420;
+            f2=850;
+            duration=.2;
+        }
+
+        if(type==="hit"){
+            f1=120;
+            f2=60;
+            duration=.09;
+        }
+
+        if(type==="boss"){
+            f1=80;
+            f2=40;
+            duration=.45;
+        }
+
+        if(type==="buy"){
+            f1=500;
+            f2=900;
+            duration=.16;
+        }
+
+        osc.type=type==="lightning"?"square":"sine";
+
+        osc.frequency.setValueAtTime(f1,now);
+        osc.frequency.exponentialRampToValueAtTime(
+            Math.max(30,f2),
+            now+duration
+        );
+
+        gain.gain.setValueAtTime(.0001,now);
+        gain.gain.exponentialRampToValueAtTime(.12,now+.015);
+        gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+
+        osc.start(now);
+        osc.stop(now+duration+.02);
+    }catch(e){}
+}
 
 /* =========================================================
    MAPS
 ========================================================= */
 
-const MAPS = [
-
+const MAPS=[
 ["Verdant Plains","#31864c","Slime","🟢"],
 ["Ember Valley","#873829","Fire Imp","👹"],
 ["Frostfall","#3d7398","Ice Wolf","🐺"],
@@ -453,290 +622,102 @@ const MAPS = [
 ["Celestial Fields","#657ba9","Seraph Guard","🪽"],
 ["Void Frontier","#302350","Voidling","👾"],
 ["Aruna Throne","#3a204d","Royal Guard","👑"]
-
 ];
 
 /* =========================================================
    20 SKILLS
 ========================================================= */
 
-const SKILLS = [
-
-{
-name:"Fireball",
-icon:"🔥",
-damage:25,
-cooldown:5000,
-type:"fire"
-},
-
-{
-name:"Lightning",
-icon:"⚡",
-damage:34,
-cooldown:6500,
-type:"lightning"
-},
-
-{
-name:"Ice Lance",
-icon:"❄️",
-damage:40,
-cooldown:7200,
-type:"ice"
-},
-
-{
-name:"Wind Blade",
-icon:"🌪️",
-damage:28,
-cooldown:5800,
-type:"wind"
-},
-
-{
-name:"Earth Spike",
-icon:"🪨",
-damage:47,
-cooldown:8500,
-type:"earth"
-},
-
-{
-name:"Water Burst",
-icon:"💧",
-damage:32,
-cooldown:6200,
-type:"water"
-},
-
-{
-name:"Dark Bolt",
-icon:"🌑",
-damage:55,
-cooldown:9000,
-type:"dark"
-},
-
-{
-name:"Holy Ray",
-icon:"✨",
-damage:60,
-cooldown:10000,
-type:"holy"
-},
-
-{
-name:"Poison Nova",
-icon:"☠️",
-damage:38,
-cooldown:7600,
-type:"poison"
-},
-
-{
-name:"Meteor",
-icon:"☄️",
-damage:78,
-cooldown:13000,
-type:"meteor"
-},
-
-{
-name:"Thunder Wave",
-icon:"🌩️",
-damage:50,
-cooldown:9500,
-type:"thunder"
-},
-
-{
-name:"Frost Nova",
-icon:"🧊",
-damage:58,
-cooldown:10500,
-type:"frost"
-},
-
-{
-name:"Vine Lash",
-icon:"🌿",
-damage:42,
-cooldown:7000,
-type:"vine"
-},
-
-{
-name:"Arcane Orb",
-icon:"🔮",
-damage:65,
-cooldown:11000,
-type:"arcane"
-},
-
-{
-name:"Flame Ring",
-icon:"🔥",
-damage:63,
-cooldown:10500,
-type:"flame"
-},
-
-{
-name:"Soul Drain",
-icon:"💜",
-damage:48,
-cooldown:8500,
-type:"soul"
-},
-
-{
-name:"Solar Spear",
-icon:"☀️",
-damage:72,
-cooldown:12000,
-type:"solar"
-},
-
-{
-name:"Moon Beam",
-icon:"🌙",
-damage:68,
-cooldown:11500,
-type:"moon"
-},
-
-{
-name:"Void Rift",
-icon:"🌀",
-damage:84,
-cooldown:14500,
-type:"void"
-},
-
-{
-name:"Aruna Burst",
-icon:"💠",
-damage:100,
-cooldown:17000,
-type:"aruna"
-}
-
+const SKILLS=[
+{name:"Fireball",icon:"🔥",damage:25,price:40,cooldown:5000,type:"fire"},
+{name:"Lightning",icon:"⚡",damage:34,price:70,cooldown:6500,type:"lightning"},
+{name:"Ice Lance",icon:"❄️",damage:40,price:100,cooldown:7200,type:"ice"},
+{name:"Wind Blade",icon:"🌪️",damage:28,price:80,cooldown:5800,type:"wind"},
+{name:"Earth Spike",icon:"🪨",damage:47,price:130,cooldown:8500,type:"earth"},
+{name:"Water Burst",icon:"💧",damage:32,price:110,cooldown:6200,type:"water"},
+{name:"Dark Bolt",icon:"🌑",damage:55,price:170,cooldown:9000,type:"dark"},
+{name:"Holy Ray",icon:"✨",damage:60,price:200,cooldown:10000,type:"holy"},
+{name:"Poison Nova",icon:"☠️",damage:38,price:140,cooldown:7600,type:"poison"},
+{name:"Meteor",icon:"☄️",damage:78,price:300,cooldown:13000,type:"meteor"},
+{name:"Thunder Wave",icon:"🌩️",damage:50,price:220,cooldown:9500,type:"thunder"},
+{name:"Frost Nova",icon:"🧊",damage:58,price:250,cooldown:10500,type:"frost"},
+{name:"Vine Lash",icon:"🌿",damage:42,price:150,cooldown:7000,type:"vine"},
+{name:"Arcane Orb",icon:"🔮",damage:65,price:280,cooldown:11000,type:"arcane"},
+{name:"Flame Ring",icon:"🔥",damage:63,price:290,cooldown:10500,type:"flame"},
+{name:"Soul Drain",icon:"💜",damage:48,price:230,cooldown:8500,type:"soul"},
+{name:"Solar Spear",icon:"☀️",damage:72,price:340,cooldown:12000,type:"solar"},
+{name:"Moon Beam",icon:"🌙",damage:68,price:320,cooldown:11500,type:"moon"},
+{name:"Void Rift",icon:"🌀",damage:84,price:400,cooldown:14500,type:"void"},
+{name:"Aruna Burst",icon:"💠",damage:100,price:600,cooldown:17000,type:"aruna"}
 ];
 
 /* =========================================================
-   30 WEAPONS
+   WEAPONS
 ========================================================= */
 
-const WEAPON_NAMES = [
-
-"Wood Sword",
-"Iron Sword",
-"Steel Sword",
-"Bronze Axe",
-"War Axe",
-"Twin Daggers",
-"Long Bow",
-"Crossbow",
-"Spear",
-"Halberd",
-"Mace",
-"Hammer",
-"Katana",
-"Greatsword",
-"Flame Blade",
-"Frost Blade",
-"Thunder Staff",
-"Wind Chakram",
-"Shadow Scythe",
-"Holy Staff",
-"Crystal Blade",
-"Poison Fang",
-"Meteor Hammer",
-"Dragon Slayer",
-"Void Blade",
-"Solar Spear",
-"Moon Staff",
-"Aruna Blade",
-"Royal Sword",
-"Legend Blade"
-
+const WEAPON_NAMES=[
+"Wood Sword","Iron Sword","Steel Sword","Bronze Axe","War Axe",
+"Twin Daggers","Long Bow","Crossbow","Spear","Halberd",
+"Mace","Hammer","Katana","Greatsword","Flame Blade",
+"Frost Blade","Thunder Staff","Wind Chakram","Shadow Scythe",
+"Holy Staff","Crystal Blade","Poison Fang","Meteor Hammer",
+"Dragon Slayer","Void Blade","Solar Spear","Moon Staff",
+"Aruna Blade","Royal Sword","Legend Blade"
 ];
 
-const WEAPONS =
-WEAPON_NAMES.map(
-    (name,index)=>({
-
-        name:name,
-
-        damage:
-        8 + index * 4,
-
-        price:
-        50 + index * 75,
-
-        type:
-        index % 6
-
-    })
-);
+const WEAPONS=WEAPON_NAMES.map((name,i)=>({
+    name,
+    damage:8+i*4,
+    price:50+i*75,
+    type:i%7
+}));
 
 /* =========================================================
    GAME STATE
 ========================================================= */
 
-let game = null;
+let game=null;
 
 function createGame(){
-
-    return {
-
+    return{
         running:true,
-
         map:0,
-
         gold:150,
-
         time:0,
 
         player:{
-
             x:0,
             y:0,
-
             hp:100,
             maxHp:100,
-
-            speed:3.2,
-
+            speed:3.8,
             direction:"down",
-
+            moving:false,
+            walkTime:0,
             attackCooldown:0,
-
-            invincible:0
-
+            invincible:0,
+            attackAnim:0
         },
 
         enemies:[],
-
         effects:[],
+        texts:[],
+        particles:[],
 
         portal:null,
-
         miniBossDead:false,
-
         bossDead:false,
 
         skillSlots:[0,1,2],
-
         skillCooldown:[0,0,0],
 
+        unlockedSkills:[0],
+
         weapon:0,
+        purchasedWeapons:[0],
 
         messageTimer:null
-
     };
-
 }
 
 /* =========================================================
@@ -744,122 +725,84 @@ function createGame(){
 ========================================================= */
 
 function startGame(){
+    initAudio();
 
-    game = createGame();
+    game=createGame();
 
-    document.getElementById(
-        "overlay"
-    ).style.display="none";
+    document.getElementById("overlay").style.display="none";
+    document.getElementById("restart").style.display="none";
+    document.getElementById("start").style.display="block";
 
-    document.getElementById(
-        "restart"
-    ).style.display="none";
+    document.getElementById("shop").style.display="none";
+    document.getElementById("skillBook").style.display="none";
 
     spawnMap();
+    updateUI();
 
-    showMessage(
-        "⚔ Map 1 dimulai! Kalahkan miniboss dan boss."
-    );
-
+    showMessage("⚔ MAP 1 DIMULAI!");
+    sound("magic");
 }
 
-document.getElementById(
-    "start"
-).addEventListener(
-    "click",
-    startGame
-);
+document.getElementById("start").addEventListener("click",function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    startGame();
+});
 
-document.getElementById(
-    "restart"
-).addEventListener(
-    "click",
-    startGame
-);
+document.getElementById("restart").addEventListener("click",function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    startGame();
+});
 
 /* =========================================================
    MESSAGE
 ========================================================= */
 
 function showMessage(text){
+    if(!game) return;
 
-    const msg =
-    document.getElementById(
-        "message"
-    );
+    const el=document.getElementById("message");
 
-    msg.textContent=text;
-
-    msg.classList.add("show");
+    el.textContent=text;
+    el.classList.add("show");
 
     clearTimeout(game.messageTimer);
 
-    game.messageTimer =
-    setTimeout(
-        ()=>{
-            msg.classList.remove("show");
-        },
-        2500
-    );
-
+    game.messageTimer=setTimeout(()=>{
+        el.classList.remove("show");
+    },2200);
 }
 
 /* =========================================================
-   MAP
+   MAP SPAWN
 ========================================================= */
 
 function spawnMap(){
 
     game.enemies=[];
-
     game.effects=[];
+    game.texts=[];
+    game.particles=[];
 
     game.portal=null;
-
     game.miniBossDead=false;
-
     game.bossDead=false;
 
     game.player.x=0;
     game.player.y=0;
+    game.player.hp=game.player.maxHp;
 
-    /*
-       NORMAL ENEMIES
-    */
+    const count=7+(game.map%5);
 
-    const normalCount =
-    7 + game.map % 5;
-
-    for(
-        let i=0;
-        i<normalCount;
-        i++
-    ){
-
-        spawnEnemy(
-            "normal"
-        );
-
+    for(let i=0;i<count;i++){
+        spawnEnemy("normal");
     }
 
-    /*
-       MINIBOSS
-    */
-
-    spawnEnemy(
-        "mini"
-    );
-
-    /*
-       BOSS
-    */
-
-    spawnEnemy(
-        "boss"
-    );
+    spawnEnemy("mini");
+    spawnEnemy("boss");
 
     updateUI();
-
 }
 
 /* =========================================================
@@ -868,240 +811,118 @@ function spawnMap(){
 
 function spawnEnemy(kind){
 
-    const angle =
-    Math.random() *
-    Math.PI *
-    2;
+    const angle=Math.random()*Math.PI*2;
+    const radius=300+Math.random()*550;
 
-    const radius =
-    260 +
-    Math.random() *
-    500;
+    const baseHp=35+game.map*12;
 
-    const baseHp =
-    35 +
-    game.map * 12;
-
-    let hp =
-    baseHp;
-
-    let speed =
-    .65 +
-    Math.random() *
-    .3;
-
+    let hp=baseHp;
+    let speed=.65+Math.random()*.3;
     let size=1;
 
     if(kind==="mini"){
-
-        hp =
-        baseHp * 4;
-
+        hp=baseHp*4;
         speed=.55;
-
         size=1.3;
-
     }
 
     if(kind==="boss"){
-
-        hp =
-        baseHp * 8;
-
+        hp=baseHp*8;
         speed=.4;
-
         size=1.7;
-
     }
 
     game.enemies.push({
-
-        x:
-        Math.cos(angle)*radius,
-
-        y:
-        Math.sin(angle)*radius,
-
-        hp:hp,
-
+        x:Math.cos(angle)*radius,
+        y:Math.sin(angle)*radius,
+        hp,
         maxHp:hp,
-
-        speed:speed,
-
-        kind:kind,
-
-        size:size,
-
-        emoji:
-        MAPS[game.map][3],
-
-        name:
-        MAPS[game.map][2],
-
+        speed,
+        kind,
+        size,
+        emoji:MAPS[game.map][3],
+        name:MAPS[game.map][2],
         attackTimer:0
-
     });
-
 }
 
 /* =========================================================
    WORLD
 ========================================================= */
 
-function worldToScreen(
-    wx,
-    wy
-){
-
-    return {
-
-        x:
-        W / (2*devicePixelRatio)
-        +
-        (wx-game.player.x),
-
-        y:
-        H / (2*devicePixelRatio)
-        +
-        (wy-game.player.y)
-
+function worldToScreen(wx,wy){
+    return{
+        x:W/2+(wx-game.player.x),
+        y:H/2+(wy-game.player.y)
     };
-
 }
 
 /* =========================================================
-   DRAW WORLD
+   WORLD DRAW
 ========================================================= */
 
 function drawWorld(){
 
-    const width =
-    W/devicePixelRatio;
-
-    const height =
-    H/devicePixelRatio;
-
-    const color =
-    MAPS[game.map][1];
+    const color=MAPS[game.map][1];
 
     ctx.fillStyle=color;
+    ctx.fillRect(0,0,W,H);
 
-    ctx.fillRect(
-        0,
-        0,
-        width,
-        height
+    const grd=ctx.createRadialGradient(
+        W/2,H/2,50,
+        W/2,H/2,Math.max(W,H)
     );
 
-    /*
-       GRID
-    */
+    grd.addColorStop(0,"rgba(255,255,255,.08)");
+    grd.addColorStop(1,"rgba(0,0,0,.25)");
+
+    ctx.fillStyle=grd;
+    ctx.fillRect(0,0,W,H);
+
+    /* GRID */
 
     ctx.globalAlpha=.12;
-
-    ctx.strokeStyle="#ffffff";
-
+    ctx.strokeStyle="#fff";
     ctx.lineWidth=1;
 
     const grid=80;
 
-    const ox =
-    ((-game.player.x)%grid+grid)%grid;
+    const ox=((-game.player.x)%grid+grid)%grid;
+    const oy=((-game.player.y)%grid+grid)%grid;
 
-    const oy =
-    ((-game.player.y)%grid+grid)%grid;
-
-    for(
-        let xx=ox;
-        xx<width;
-        xx+=grid
-    ){
-
+    for(let x=ox;x<W;x+=grid){
         ctx.beginPath();
-
-        ctx.moveTo(xx,0);
-
-        ctx.lineTo(
-            xx,
-            height
-        );
-
+        ctx.moveTo(x,0);
+        ctx.lineTo(x,H);
         ctx.stroke();
-
     }
 
-    for(
-        let yy=oy;
-        yy<height;
-        yy+=grid
-    ){
-
+    for(let y=oy;y<H;y+=grid){
         ctx.beginPath();
-
-        ctx.moveTo(
-            0,
-            yy
-        );
-
-        ctx.lineTo(
-            width,
-            yy
-        );
-
+        ctx.moveTo(0,y);
+        ctx.lineTo(W,y);
         ctx.stroke();
-
     }
 
     ctx.globalAlpha=1;
 
-    /*
-       TERRAIN DECORATION
-    */
+    /* DECORATIONS */
 
-    for(
-        let i=0;
-        i<45;
-        i++
-    ){
+    for(let i=0;i<55;i++){
 
-        const wx =
-        ((i*197+
-        game.map*93)%2200)-1100;
+        const wx=((i*197+game.map*93)%2200)-1100;
+        const wy=((i*137+game.map*51)%1500)-750;
 
-        const wy =
-        ((i*137+
-        game.map*51)%1500)-750;
+        const p=worldToScreen(wx,wy);
 
-        const p =
-        worldToScreen(
-            wx,
-            wy
-        );
+        if(p.x<-40||p.x>W+40||p.y<-40||p.y>H+40) continue;
 
-        if(
-            p.x<-30 ||
-            p.x>width+30 ||
-            p.y<-30 ||
-            p.y>height+30
-        ) continue;
-
-        ctx.fillStyle=
-        "rgba(255,255,255,.12)";
+        ctx.fillStyle="rgba(255,255,255,.12)";
 
         ctx.beginPath();
-
-        ctx.arc(
-            p.x,
-            p.y,
-            5+(i%4)*3,
-            0,
-            Math.PI*2
-        );
-
+        ctx.arc(p.x,p.y,4+(i%4)*2,0,Math.PI*2);
         ctx.fill();
-
     }
-
 }
 
 /* =========================================================
@@ -1110,340 +931,36 @@ function drawWorld(){
 
 function drawPlayer(){
 
-    const p =
-    worldToScreen(
-        game.player.x,
-        game.player.y
-    );
+    const p=worldToScreen(game.player.x,game.player.y);
 
-    const bob =
-    Math.sin(
-        game.time/90
-    )*2;
+    const moving=game.player.moving;
+
+    const walk=moving?Math.sin(game.player.walkTime)*6:0;
+    const bob=moving?Math.abs(Math.sin(game.player.walkTime))*2:0;
 
     ctx.save();
 
-    ctx.translate(
-        p.x,
-        p.y+bob
-    );
+    ctx.translate(p.x,p.y-bob);
 
-    /*
-       SHADOW
-    */
+    /* SHADOW */
 
     ctx.fillStyle="#0008";
-
     ctx.beginPath();
-
-    ctx.ellipse(
-        0,
-        28,
-        25,
-        9,
-        0,
-        0,
-        Math.PI*2
-    );
-
+    ctx.ellipse(0,30,26,9,0,0,Math.PI*2);
     ctx.fill();
 
-    /*
-       LEGS
-    */
+    /* LEGS */
 
-    const step =
-    Math.sin(
-        game.time/90
-    )*5;
-
-    ctx.strokeStyle="#18233b";
-
+    ctx.strokeStyle="#17243b";
     ctx.lineWidth=9;
-
     ctx.lineCap="round";
 
     ctx.beginPath();
 
-    ctx.moveTo(
-        -8,
-        10
-    );
-
-    ctx.lineTo(
-        -10+step,
-        29
-    );
-
-    ctx.moveTo(
-        8,
-        10
-    );
-
-    ctx.lineTo(
-        10-step,
-        29
-    );
-
-    ctx.stroke();
-
-    /*
-       BODY
-    */
-
-    ctx.fillStyle="#279ff1";
-
-    ctx.strokeStyle="#e0f8ff";
-
-    ctx.lineWidth=2;
-
-    ctx.fillRect(
-        -15,
-        -14,
-        30,
-        29
-    );
-
-    ctx.strokeRect(
-        -15,
-        -14,
-        30,
-        29
-    );
-
-    /*
-       ARMS
-    */
-
-    const arm =
-    Math.sin(
-        game.time/90
-    )*7;
-
-    ctx.strokeStyle="#ffd0aa";
-
-    ctx.lineWidth=8;
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        -15,
-        -8
-    );
-
-    ctx.lineTo(
-        -28,
-        -2+arm
-    );
-
-    ctx.moveTo(
-        15,
-        -8
-    );
-
-    ctx.lineTo(
-        28,
-        -2-arm
-    );
-
-    ctx.stroke();
-
-    /*
-       HEAD
-    */
-
-    ctx.fillStyle="#ffd0aa";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        0,
-        -27,
-        13,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-    /*
-       HAIR
-    */
-
-    ctx.fillStyle="#342018";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        0,
-        -32,
-        13,
-        Math.PI,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-    /*
-       FACE DIRECTION
-    */
-
-    ctx.fillStyle="#111";
-
-    if(
-        game.player.direction==="right"
-    ){
-
-        ctx.fillRect(
-            7,
-            -29,
-            3,
-            3
-        );
-
-    }
-    else if(
-        game.player.direction==="left"
-    ){
-
-        ctx.fillRect(
-            -10,
-            -29,
-            3,
-            3
-        );
-
-    }
-    else if(
-        game.player.direction==="up"
-    ){
-
-        ctx.fillStyle="#342018";
-
-        ctx.fillRect(
-            -9,
-            -39,
-            18,
-            5
-        );
-
-    }
-    else{
-
-        ctx.fillRect(
-            -7,
-            -30,
-            3,
-            3
-        );
-
-        ctx.fillRect(
-            5,
-            -30,
-            3,
-            3
-        );
-
-    }
-
-    ctx.restore();
-
-}
-
-/* =========================================================
-   ENEMY
-========================================================= */
-
-function drawEnemy(e){
-
-    const p =
-    worldToScreen(
-        e.x,
-        e.y
-    );
-
-    const width =
-    W/devicePixelRatio;
-
-    const height =
-    H/devicePixelRatio;
-
-    if(
-        p.x<-100 ||
-        p.x>width+100 ||
-        p.y<-100 ||
-        p.y>height+100
-    ) return;
-
-    ctx.save();
-
-    ctx.translate(
-        p.x,
-        p.y
-    );
-
-    ctx.scale(
-        e.size,
-        e.size
-    );
-
-    /*
-       SHADOW
-    */
-
-    ctx.fillStyle="#0008";
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        0,
-        28,
-        28,
-        8,
-        0,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-    /*
-       DIFFERENT SHAPES
-       DEPENDING ON MAP
-    */
-
-    const type =
-    game.map % 6;
-
-    if(type===0){
-
-        ctx.fillStyle="#65d94a";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            0,
-            0,
-            25,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-    }
-    else if(type===1){
-
-        ctx.fillStyle="#df452d";
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            0,-30
-        );
-
-        ctx.lineTo(
-            -25,25
-        );
-
-        ctx.lineT
+    if(moving){
+        ctx.moveTo(-8,10);
+        ctx.lineTo(-10+walk,30);
+
+        ctx.moveTo(8,10);
+        ctx.lineTo(10-walk,30);
+   
