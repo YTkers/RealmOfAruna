@@ -22,8 +22,12 @@ public class MainActivity extends Activity {
 
         webView.setWebViewClient(new WebViewClient());
 
-        webView.loadUrl("file:///android_asset/index.html");
+        webView.loadData(
+            "<html><body style='background:black;color:red;text-align:center;padding-top:100px'><h1>WEBVIEW BARU</h1></body></html>",
+            "text/html",
+            "UTF-8"
+        );
 
         setContentView(webView);
     }
-}
+    }
