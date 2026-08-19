@@ -21,21 +21,33 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install Android SDK
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Set up Gradle 8.9
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Build RealmOfAruna
-        run: gradle :app:assembleDebug --no-daemon
+      - name: Build APK
+        run: |
+          gradle :app:assembleDebug --no-daemon
 
-      - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk RealmOfAruna.apk
+      - name: Find APK
+        run: |
+          echo "Mencari APK..."
+          find . -type f -name "*.apk" -print
+
+      - name: Prepare RealmOfAruna.apk
+        run: |
+          APK=$(find app/build/outputs -type f -name "*.apk" | head -n 1)
+          echo "APK ditemukan: $APK"
+          cp "$APK" RealmOfAruna.apk
+          ls -lh RealmOfAruna.apk
 
       - name: Upload RealmOfAruna.apk
         uses: actions/upload-artifact@v4
         with:
           name: RealmOfAruna-apk
           path: RealmOfAruna.apk
+          if-no-files-found: error
