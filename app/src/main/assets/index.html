@@ -1,985 +1,761 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Realm Of Aruna</title>
-
-<style>
-*{
-    box-sizing:border-box;
-    user-select:none;
-    -webkit-user-select:none;
-    touch-action:none;
-}
-
-html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#07101c;
-    color:#fff;
-    font-family:Arial,sans-serif;
-}
-
-#game{
-    position:fixed;
-    inset:0;
-    overflow:hidden;
-}
-
-canvas{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-}
-
-#topUI{
-    position:absolute;
-    top:8px;
-    left:8px;
-    right:8px;
-    display:flex;
-    justify-content:space-between;
-    z-index:20;
-    pointer-events:none;
-}
-
-.panel{
-    background:rgba(4,12,30,.9);
-    border:2px solid #56ddff;
-    border-radius:14px;
-    padding:8px 11px;
-    text-shadow:0 2px 3px #000;
-}
-
-#title{
-    color:#72edff;
-    font-size:17px;
-    font-weight:900;
-}
-
-.small{
-    font-size:12px;
-    margin-top:3px;
-}
-
-#hpbar{
-    width:160px;
-    height:12px;
-    margin-top:5px;
-    overflow:hidden;
-    border:1px solid #fff;
-    border-radius:10px;
-    background:#421622;
-}
-
-#hpfill{
-    width:100%;
-    height:100%;
-    background:linear-gradient(90deg,#15df62,#e6ff55);
-}
-
-#weaponName{
-    color:#ffe35b;
-    font-size:12px;
-    margin-top:3px;
-}
-
-#message{
-    position:absolute;
-    top:92px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:50;
-    max-width:90%;
-    padding:9px 15px;
-    border:2px solid #ffe15a;
-    border-radius:12px;
-    background:rgba(0,0,0,.9);
-    font-weight:900;
-    text-align:center;
-    opacity:0;
-    transition:.2s;
-    pointer-events:none;
-}
-
-#message.show{
-    opacity:1;
-}
-
-#joystick{
-    position:absolute;
-    left:20px;
-    bottom:20px;
-    width:125px;
-    height:125px;
-    z-index:30;
-    border:3px solid #8cecff;
-    border-radius:50%;
-    background:rgba(55,110,155,.4);
-}
-
-#knob{
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:58px;
-    height:58px;
-    transform:translate(-50%,-50%);
-    border:3px solid #fff;
-    border-radius:50%;
-    background:#35caff;
-    box-shadow:0 0 18px #19caff;
-}
-
-#buttons{
-    position:absolute;
-    right:10px;
-    bottom:15px;
-    z-index:30;
-    display:flex;
-    align-items:flex-end;
-    gap:7px;
-}
-
-button{
-    color:#fff;
-    font-family:Arial,sans-serif;
-    font-weight:900;
-    border:2px solid #fff;
-    cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
-}
-
-#attack{
-    width:84px;
-    height:84px;
-    border-radius:50%;
-    background:radial-gradient(circle,#ffe45c,#ff7a20,#d62222);
-    box-shadow:0 5px 18px #000b;
-}
-
-.skills{
-    display:flex;
-    gap:5px;
-}
-
-.skill{
-    position:relative;
-    width:58px;
-    height:58px;
-    border-radius:13px;
-    background:linear-gradient(#7d4cff,#24145e);
-    font-size:23px;
-}
-
-.skill b{
-    position:absolute;
-    top:3px;
-    left:5px;
-    font-size:10px;
-}
-
-.skill .cooldown{
-    position:absolute;
-    right:2px;
-    bottom:2px;
-    left:2px;
-    font-size:9px;
-    text-align:center;
-}
-
-#overlay{
-    position:absolute;
-    inset:0;
-    z-index:100;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:radial-gradient(circle,#1c416aaa,#020711f7);
-}
-
-#menu{
-    width:min(430px,90%);
-    padding:25px;
-    border:2px solid #59ddff;
-    border-radius:22px;
-    background:rgba(5,17,39,.97);
-    text-align:center;
-    box-shadow:0 0 35px #20caff44;
-}
-
-#menu h1{
-    margin:0;
-    color:#71ecff;
-    font-size:34px;
-    text-shadow:0 0 15px #1a9fff;
-}
-
-#menu p{
-    color:#e1f9ff;
-    line-height:1.5;
-}
-
-.menuBtn{
-    width:100%;
-    margin-top:9px;
-    padding:14px;
-    border-radius:12px;
-    background:linear-gradient(90deg,#277cff,#a536ff);
-    font-size:17px;
-}
-
-#restart{
-    display:none;
-}
-
-#shopToggle{
-    position:absolute;
-    top:125px;
-    right:10px;
-    z-index:25;
-    padding:9px 12px;
-    border-radius:10px;
-    background:linear-gradient(#ffc936,#a94a00);
-}
-
-#shop{
-    position:absolute;
-    top:170px;
-    right:10px;
-    z-index:26;
-    display:none;
-    width:230px;
-    max-height:55vh;
-    overflow:auto;
-    padding:10px;
-    border:2px solid #ffd54d;
-    border-radius:13px;
-    background:rgba(5,15,35,.96);
-}
-
-.shopItem{
-    width:100%;
-    margin-top:5px;
-    padding:8px;
-    border-radius:8px;
-    background:#253e68;
-    font-size:11px;
-}
-
-#skillShop{
-    margin-top:10px;
-}
-
-@media(max-width:600px){
-    #joystick{
-        width:115px;
-        height:115px;
-    }
-
-    #knob{
-        width:54px;
-        height:54px;
-    }
-
-    .skill{
-        width:52px;
-        height:52px;
-    }
-
-    #attack{
-        width:76px;
-        height:76px;
-    }
-
-    #hpbar{
-        width:130px;
-    }
-
-    #shop{
-        width:210px;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<div id="game">
-
-<canvas id="canvas"></canvas>
-
-<div id="topUI">
-    <div class="panel">
-        <div id="title">⚔ REALM OF ARUNA</div>
-        <div class="small" id="mapText">Map 1 — Verdant Plains</div>
-        <div class="small">❤️ <span id="hpText">100/100</span></div>
-        <div id="hpbar"><div id="hpfill"></div></div>
-        <div class="small" id="weaponName">⚔ Wood Sword</div>
-    </div>
-
-    <div class="panel">
-        💰 <span id="gold">150</span>
-    </div>
-</div>
-
-<div id="message"></div>
-
-<button id="shopToggle">🛒 SHOP</button>
-
-<div id="shop">
-    <b>⚔ WEAPON SHOP</b>
-    <div id="shopItems"></div>
-    <div id="skillShop"></div>
-</div>
-
-<div id="joystick">
-    <div id="knob"></div>
-</div>
-
-<div id="buttons">
-    <div class="skills">
-        <button class="skill" id="skill0"></button>
-        <button class="skill" id="skill1"></button>
-        <button class="skill" id="skill2"></button>
-    </div>
-    <button id="attack">ATTACK</button>
-</div>
-
-<div id="overlay">
-    <div id="menu">
-        <h1>REALM OF ARUNA</h1>
-
-        <p id="menuText">
-            Kalahkan musuh, miniboss, dan boss.
-            Gunakan joystick untuk bergerak dan
-            skill untuk menyerang.
-        </p>
-
-        <button class="menuBtn" id="start">
-            ⚔ START GAME
-        </button>
-
-        <button class="menuBtn" id="restart">
-            🔄 RESTART GAME
-        </button>
-    </div>
-</div>
-
-</div>
-
-<script>
-"use strict";
-
-/* ================= CANVAS ================= */
-
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
-
-let W=innerWidth;
-let H=innerHeight;
-let DPR=Math.max(1,Math.min(2,devicePixelRatio||1));
-
-function resize(){
-    W=innerWidth;
-    H=innerHeight;
-    DPR=Math.max(1,Math.min(2,devicePixelRatio||1));
-
-    canvas.width=W*DPR;
-    canvas.height=H*DPR;
-    canvas.style.width=W+"px";
-    canvas.style.height=H+"px";
-
-    ctx.setTransform(DPR,0,0,DPR,0,0);
-}
-
-addEventListener("resize",resize);
-resize();
-
-/* ================= MAPS ================= */
-
-const MAPS=[
-["Verdant Plains","#31864c","Slime","🟢"],
-["Ember Valley","#873829","Fire Imp","👹"],
-["Frostfall","#3d7398","Ice Wolf","🐺"],
-["Storm Coast","#435f9e","Volt Bat","🦇"],
-["Moonlit Woods","#3d4b73","Shadow Cat","🐈"],
-["Crystal Caves","#6b4d98","Crystal Bug","🪲"],
-["Sunken Ruins","#397b7e","Aqua Ghoul","🧟"],
-["Ashen Fields","#604332","Ash Hound","🐕"],
-["Sky Islands","#537fae","Wind Hawk","🦅"],
-["Toxic Marsh","#54783a","Poison Frog","🐸"],
-["Golden Desert","#a77c31","Sand Scarab","🪲"],
-["Ancient Grove","#35653f","Treant","🌳"],
-["Obsidian Pass","#4c414d","Rock Golem","🗿"],
-["Starfall Valley","#505781","Astral Orb","🔮"],
-["Haunted Keep","#342e51","Wraith","👻"],
-["Dragonlands","#703331","Drake","🐲"],
-["Infernal Gate","#792728","Demon","😈"],
-["Celestial Fields","#657ba9","Seraph Guard","🪽"],
-["Void Frontier","#302350","Voidling","👾"],
-["Aruna Throne","#3a204d","Royal Guard","👑"]
-];
-
-/* ================= 20 SKILLS ================= */
-
-const SKILLS=[
-{name:"Fireball",icon:"🔥",damage:25,cooldown:4000,type:"fire",price:80},
-{name:"Lightning",icon:"⚡",damage:34,cooldown:5200,type:"lightning",price:120},
-{name:"Ice Lance",icon:"❄️",damage:40,cooldown:6000,type:"ice",price:160},
-{name:"Wind Blade",icon:"🌪️",damage:28,cooldown:4500,type:"wind",price:110},
-{name:"Earth Spike",icon:"🪨",damage:47,cooldown:7000,type:"earth",price:200},
-{name:"Water Burst",icon:"💧",damage:32,cooldown:5200,type:"water",price:150},
-{name:"Dark Bolt",icon:"🌑",damage:55,cooldown:7600,type:"dark",price:260},
-{name:"Holy Ray",icon:"✨",damage:60,cooldown:8200,type:"holy",price:300},
-{name:"Poison Nova",icon:"☠️",damage:38,cooldown:6500,type:"poison",price:180},
-{name:"Meteor",icon:"☄️",damage:78,cooldown:10500,type:"meteor",price:450},
-{name:"Thunder Wave",icon:"🌩️",damage:50,cooldown:8000,type:"thunder",price:280},
-{name:"Frost Nova",icon:"🧊",damage:58,cooldown:8500,type:"frost",price:320},
-{name:"Vine Lash",icon:"🌿",damage:42,cooldown:6200,type:"vine",price:210},
-{name:"Arcane Orb",icon:"🔮",damage:65,cooldown:9000,type:"arcane",price:380},
-{name:"Flame Ring",icon:"🔥",damage:63,cooldown:8800,type:"flame",price:360},
-{name:"Soul Drain",icon:"💜",damage:48,cooldown:7200,type:"soul",price:250},
-{name:"Solar Spear",icon:"☀️",damage:72,cooldown:9800,type:"solar",price:420},
-{name:"Moon Beam",icon:"🌙",damage:68,cooldown:9300,type:"moon",price:400},
-{name:"Void Rift",icon:"🌀",damage:84,cooldown:11500,type:"void",price:520},
-{name:"Aruna Burst",icon:"💠",damage:100,cooldown:14000,type:"aruna",price:700}
-];
-
-/* ================= 30 WEAPONS ================= */
-
-const WEAPON_NAMES=[
-"Wood Sword","Iron Sword","Steel Sword","Bronze Axe","War Axe",
-"Twin Daggers","Long Bow","Crossbow","Spear","Halberd",
-"Mace","Hammer","Katana","Greatsword","Flame Blade",
-"Frost Blade","Thunder Staff","Wind Chakram","Shadow Scythe",
-"Holy Staff","Crystal Blade","Poison Fang","Meteor Hammer",
-"Dragon Slayer","Void Blade","Solar Spear","Moon Staff",
-"Aruna Blade","Royal Sword","Legend Blade"
-];
-
-const WEAPONS=WEAPON_NAMES.map((name,i)=>({
-    name:name,
-    damage:8+i*4,
-    price:50+i*75,
-    type:i%7
-}));
-
-/* ================= GAME ================= */
-
-let game=null;
-
-function createGame(){
-    return{
-        running:true,
-        map:0,
-        gold:150,
-        time:0,
-
-        player:{
-            x:0,
-            y:0,
-            hp:100,
-            maxHp:100,
-            speed:3.5,
-            direction:"down",
-            moving:false,
-            attackCooldown:0,
-            invincible:0,
-            attackAnim:0
-        },
-
-        enemies:[],
-        effects:[],
-        floating:[],
-        portal:null,
-
-        miniBossDead:false,
-        bossDead:false,
-
-        skillSlots:[0,1,2],
-        skillCooldown:[0,0,0],
-
-        unlockedSkills:[0,1,2],
-        weapon:0,
-
-        messageTimer:null
-    };
-}
-
-/* ================= AUDIO ================= */
-
-let audioCtx=null;
-
-function initAudio(){
-    try{
-        if(!audioCtx){
-            audioCtx=new(
-                window.AudioContext||
-                window.webkitAudioContext
-            )();
-        }
-
-        if(audioCtx.state==="suspended"){
-            audioCtx.resume();
-        }
-    }catch(e){}
-}
-
-function sound(type){
-    if(!audioCtx)return;
-
-    try{
-        const o=audioCtx.createOscillator();
-        const g=audioCtx.createGain();
-
-        o.connect(g);
-        g.connect(audioCtx.destination);
-
-        const now=audioCtx.currentTime;
-
-        let f=300;
-        let end=.12;
-        let wave="sine";
-
-        if(type==="attack"){
-            f=140;
-            end=.08;
-            wave="square";
-        }
-
-        if(type==="fire"){
-            f=180;
-            end=.2;
-            wave="sawtooth";
-        }
-
-        if(type==="lightning"){
-            f=700;
-            end=.18;
-            wave="square";
-        }
-
-        if(type==="ice"){
-            f=900;
-            end=.18;
-        }
-
-        if(type==="boss"){
-            f=80;
-            end=.5;
-            wave="sawtooth";
-        }
-
-        if(type==="portal"){
-            f=500;
-            end=.5;
-        }
-
-        if(type==="buy"){
-            f=800;
-            end=.12;
-        }
-
-        o.type=wave;
-        o.frequency.setValueAtTime(f,now);
-        o.frequency.exponentialRampToValueAtTime(
-            Math.max(40,f*.35),
-            now+end
-        );
-
-        g.gain.setValueAtTime(.0001,now);
-        g.gain.exponentialRampToValueAtTime(.16,now+.01);
-        g.gain.exponentialRampToValueAtTime(.0001,now+end);
-
-        o.start(now);
-        o.stop(now+end+.02);
-    }catch(e){}
-}
-
-/* ================= START / RESTART ================= */
-
-function startGame(){
-
-    initAudio();
-
-    game=createGame();
-
-    document.getElementById("overlay").style.display="none";
-    document.getElementById("start").style.display="block";
-    document.getElementById("restart").style.display="none";
-    document.getElementById("shop").style.display="none";
-
-    spawnMap();
-    updateUI();
-
-    showMessage("⚔ MAP 1 DIMULAI!");
-}
-
-document.getElementById("start").addEventListener("pointerup",function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    startGame();
-});
-
-document.getElementById("restart").addEventListener("pointerup",function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    startGame();
-});
-
-document.getElementById("start").addEventListener("click",function(e){
-    e.preventDefault();
-    e.stopPropagation();
-});
-
-document.getElementById("restart").addEventListener("click",function(e){
-    e.preventDefault();
-    e.stopPropagation();
-});
-
-/* ================= MESSAGE ================= */
-
-function showMessage(text){
-    if(!game)return;
-
-    const el=document.getElementById("message");
-
-    el.textContent=text;
-    el.classList.add("show");
-
-    clearTimeout(game.messageTimer);
-
-    game.messageTimer=setTimeout(()=>{
-        el.classList.remove("show");
-    },2200);
-}
-
-/* ================= MAP SPAWN ================= */
-
-function spawnMap(){
-
-    game.enemies=[];
-    game.effects=[];
-    game.floating=[];
-    game.portal=null;
-
-    game.miniBossDead=false;
-    game.bossDead=false;
-
-    game.player.x=0;
-    game.player.y=0;
-    game.player.hp=game.player.maxHp;
-
-    const count=7+(game.map%5);
-
-    for(let i=0;i<count;i++){
-        spawnEnemy("normal");
-    }
-
-    spawnEnemy("mini");
-    spawnEnemy("boss");
-
-    updateUI();
-}
-
-/* ================= ENEMY ================= */
-
-function spawnEnemy(kind){
-
-    const angle=Math.random()*Math.PI*2;
-    const radius=330+Math.random()*500;
-
-    let hp=35+game.map*14;
-    let speed=.55+Math.random()*.3;
-    let size=1;
-
-    if(kind==="mini"){
-        hp*=4;
-        speed=.45;
-        size=1.35;
-    }
-
-    if(kind==="boss"){
-        hp*=9;
-        speed=.34;
-        size=1.7;
-    }
-
-    game.enemies.push({
-        x:Math.cos(angle)*radius,
-        y:Math.sin(angle)*radius,
-        hp:hp,
-        maxHp:hp,
-        speed:speed,
-        kind:kind,
-        size:size,
-        hit:0
-    });
-}
-
-/* ================= WORLD ================= */
-
-function worldToScreen(x,y){
-    return{
-        x:W/2+(x-game.player.x),
-        y:H/2+(y-game.player.y)
-    };
-}
-
-function drawWorld(){
-
-    ctx.fillStyle=MAPS[game.map][1];
-    ctx.fillRect(0,0,W,H);
-
-    ctx.globalAlpha=.12;
-    ctx.strokeStyle="#fff";
-    ctx.lineWidth=1;
-
-    const grid=80;
-
-    const ox=((-game.player.x)%grid+grid)%grid;
-    const oy=((-game.player.y)%grid+grid)%grid;
-
-    for(let x=ox;x<W;x+=grid){
-        ctx.beginPath();
-        ctx.moveTo(x,0);
-        ctx.lineTo(x,H);
-        ctx.stroke();
-    }
-
-    for(let y=oy;y<H;y+=grid){
-        ctx.beginPath();
-        ctx.moveTo(0,y);
-        ctx.lineTo(W,y);
-        ctx.stroke();
-    }
-
-    ctx.globalAlpha=1;
-
-    for(let i=0;i<60;i++){
-
-        const wx=((i*197+game.map*91)%2600)-1300;
-        const wy=((i*137+game.map*51)%1800)-900;
-
-        const p=worldToScreen(wx,wy);
-
-        if(p.x<-30||p.x>W+30||p.y<-30||p.y>H+30)continue;
-
-        ctx.fillStyle="rgba(255,255,255,.14)";
-        ctx.beginPath();
-        ctx.arc(p.x,p.y,3+(i%5)*2,0,Math.PI*2);
-        ctx.fill();
-    }
-}
-
-/* ================= PLAYER ================= */
-
-function drawPlayer(){
-
-    const p=worldToScreen(
-        game.player.x,
-        game.player.y
-    );
-
-    const moving=game.player.moving;
-    const walk=moving?Math.sin(game.time/70)*7:0;
-    const dir=game.player.direction;
-
-    ctx.save();
-    ctx.translate(p.x,p.y);
-
-    ctx.fillStyle="#0008";
-    ctx.beginPath();
-    ctx.ellipse(0,28,27,9,0,0,Math.PI*2);
-    ctx.fill();
-
-    ctx.strokeStyle="#17243b";
-    ctx.lineWidth=9;
-    ctx.lineCap="round";
-
-    ctx.beginPath();
-    ctx.moveTo(-8,10);
-    ctx.lineTo(-10+walk,30);
-    ctx.moveTo(8,10);
-    ctx.lineTo(10-walk,30);
-    ctx.stroke();
-
-    ctx.strokeStyle="#0d1424";
-    ctx.lineWidth=5;
-
-    ctx.beginPath();
-    ctx.moveTo(-10+walk,30);
-    ctx.lineTo(-15+walk,31);
-    ctx.moveTo(10-walk,30);
-    ctx.lineTo(15-walk,31);
-    ctx.stroke();
-
-    ctx.fillStyle="#278ee9";
-    ctx.strokeStyle="#d8f6ff";
-    ctx.lineWidth=2;
-
-    ctx.fillRect(-15,-14,30,29);
-    ctx.strokeRect(-15,-14,30,29);
-
-    const armSwing=moving?Math.sin(game.time/70)*9:0;
-
-    ctx.strokeStyle="#ffd0aa";
-    ctx.lineWidth=8;
-
-    ctx.beginPath();
-    ctx.moveTo(-15,-7);
-    ctx.lineTo(-28,-3-armSwing);
-    ctx.moveTo(15,-7);
-    ctx.lineTo(28,-3+armSwing);
-    ctx.stroke();
-
-    ctx.fillStyle="#ffd0aa";
-    ctx.beginPath();
-    ctx.arc(0,-27,13,0,Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle="#39231b";
-    ctx.beginPath();
-    ctx.arc(0,-31,13,Math.PI,Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle="#111";
-
-    if(dir==="down"){
-        ctx.fillRect(-7,-29,3,3);
-        ctx.fillRect(5,-29,3,3);
-    }
-
-    if(dir==="right"){
-        ctx.fillRect(7,-29,3,3);
-    }
-
-    if(dir==="left"){
-        ctx.fillRect(-10,-29,3,3);
-    }
-
-    if(dir==="up"){
-        ctx.fillStyle="#39231b";
-        ctx.fillRect(-10,-39,20,5);
-    }
-
-    drawWeapon(dir);
-
-    if(game.player.attackAnim>0){
-
-        ctx.strokeStyle="#fff5a0";
-        ctx.lineWidth=5;
-        ctx.shadowBlur=15;
-        ctx.shadowColor="#fff";
-
-        ctx.beginPath();
-
-        if(dir==="right"){
-            ctx.arc(25,0,32,-1,1);
-        }else if(dir==="left"){
-            ctx.arc(-25,0,32,2,4);
-        }else if(dir==="up"){
-            ctx.arc(0,-20,32,3.3,6);
-        }else{
-            ctx.arc(0,15,32,0,3);
-        }
-
-        ctx.stroke();
-    }
-
-    ctx.restore();
-}
-
-/* ================= WEAPON DRAW ================= */
+/* ================= WEAPON RENDERING ================= */
 
 function drawWeapon(dir){
 
     ctx.save();
 
-    let angle=0;
+    let angle = 0;
 
-    if(dir==="right")angle=0;
-    if(dir==="down")angle=Math.PI/2;
-    if(dir==="left")angle=Math.PI;
-    if(dir==="up")angle=-Math.PI/2;
+    if(dir === "right") angle = 0;
+    if(dir === "down") angle = Math.PI / 2;
+    if(dir === "left") angle = Math.PI;
+    if(dir === "up") angle = -Math.PI / 2;
 
-    ctx.translate(25,0);
+    ctx.translate(25, 0);
     ctx.rotate(angle);
 
-    const weapon=game.weapon;
+    const weapon = game.weapon;
 
-    if(weapon%5===0){
+    if(weapon % 5 === 0){
 
-        ctx.strokeStyle="#f2f2f2";
-        ctx.lineWidth=5;
-
-        ctx.beginPath();
-        ctx.moveTo(0,0);
-        ctx.lineTo(32,0);
-        ctx.stroke();
-
-        ctx.strokeStyle="#8b5a2b";
-        ctx.lineWidth=4;
+        ctx.strokeStyle = "#f2f2f2";
+        ctx.lineWidth = 5;
 
         ctx.beginPath();
-        ctx.moveTo(-4,0);
-        ctx.lineTo(5,0);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(32, 0);
         ctx.stroke();
 
-    }else if(weapon%5===1){
-
-        ctx.strokeStyle="#bfc8d9";
-        ctx.lineWidth=7;
+        ctx.strokeStyle = "#8b5a2b";
+        ctx.lineWidth = 4;
 
         ctx.beginPath();
-        ctx.moveTo(0,0);
-        ctx.lineTo(29,0);
+        ctx.moveTo(-4, 0);
+        ctx.lineTo(5, 0);
         ctx.stroke();
 
-        ctx.fillStyle="#d8a62c";
-        ctx.fillRect(-5,-4,7,8);
+    } else if(weapon % 5 === 1){
 
-    }else if(weapon%5===2){
-
-        ctx.strokeStyle="#dcecff";
-        ctx.lineWidth=3;
+        ctx.strokeStyle = "#bfc8d9";
+        ctx.lineWidth = 7;
 
         ctx.beginPath();
-        ctx.moveTo(0,0);
-        ctx.lineTo(38,0);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(29, 0);
+        ctx.stroke();
+
+        ctx.fillStyle = "#d8a62c";
+        ctx.fillRect(-5, -4, 7, 8);
+
+    } else if(weapon % 5 === 2){
+
+        ctx.strokeStyle = "#dcecff";
+        ctx.lineWidth = 3;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(38, 0);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(30,-6);
-        ctx.lineTo(38,0);
-        ctx.lineTo(30,6);
+        ctx.moveTo(30, -6);
+        ctx.lineTo(38, 0);
+        ctx.lineTo(30, 6);
         ctx.stroke();
 
-    }else if(weapon%5===3){
+    } else if(weapon % 5 === 3){
 
-        ctx.strokeStyle="#aab3c4";
-        ctx.lineWidth=6;
+        ctx.strokeStyle = "#aab3c4";
+        ctx.lineWidth = 6;
 
         ctx.beginPath();
-        ctx.moveTo(0,0);
-        ctx.lineTo(28,0);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(28, 0);
         ctx.stroke();
 
-        ctx.strokeStyle="#6b421f";
-        ctx.lineWidth=5;
+        ctx.strokeStyle = "#6b421f";
+        ctx.lineWidth = 5;
 
         ctx.beginPath();
-        ctx.moveTo(-5,-7);
-        ctx.lineTo(7,7);
+        ctx.moveTo(-5, -7);
+        ctx.lineTo(7, 7);
         ctx.stroke();
 
-    }else{
+    } else {
 
-        ctx.strokeStyle="#b9ffff";
-        ctx.lineWidth=6;
-        
+        ctx.strokeStyle = "#b9ffff";
+        ctx.lineWidth = 6;
+
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = "#55eaff";
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(36, 0);
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = "#55eaff";
+        ctx.beginPath();
+        ctx.moveTo(36, 0);
+        ctx.lineTo(27, -7);
+        ctx.lineTo(27, 7);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    ctx.restore();
+}
+
+/* ================= ENEMY RENDERING ================= */
+
+function drawEnemy(e){
+
+    const p = worldToScreen(e.x, e.y);
+
+    if(
+        p.x < -100 ||
+        p.x > W + 100 ||
+        p.y < -100 ||
+        p.y > H + 100
+    ) return;
+
+    ctx.save();
+
+    ctx.translate(p.x, p.y);
+
+    const bob = Math.sin(game.time / 150 + e.x) * 3;
+
+    ctx.translate(0, bob);
+    ctx.scale(e.size, e.size);
+
+    /* shadow */
+
+    ctx.fillStyle = "#0008";
+
+    ctx.beginPath();
+    ctx.ellipse(0, 25, 27, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* enemy body */
+
+    const type = game.map % 6;
+
+    if(type === 0){
+
+        ctx.fillStyle = "#61d84b";
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 24, 0, Math.PI * 2);
+        ctx.fill();
+
+    } else if(type === 1){
+
+        ctx.fillStyle = "#e04a32";
+
+        ctx.beginPath();
+        ctx.moveTo(0, -28);
+        ctx.lineTo(-25, 22);
+        ctx.lineTo(0, 16);
+        ctx.lineTo(25, 22);
+        ctx.closePath();
+        ctx.fill();
+
+    } else if(type === 2){
+
+        ctx.fillStyle = "#cceeff";
+
+        ctx.beginPath();
+        ctx.moveTo(0, -28);
+        ctx.lineTo(-24, 20);
+        ctx.lineTo(0, 14);
+        ctx.lineTo(24, 20);
+        ctx.closePath();
+        ctx.fill();
+
+    } else if(type === 3){
+
+        ctx.fillStyle = "#765fff";
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 24, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "#aeeaff";
+        ctx.lineWidth = 4;
+
+        ctx.beginPath();
+        ctx.moveTo(-20, -20);
+        ctx.lineTo(20, 20);
+        ctx.stroke();
+
+    } else if(type === 4){
+
+        ctx.fillStyle = "#30284f";
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 24, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#ff4e91";
+        ctx.beginPath();
+        ctx.arc(-8, -3, 4, 0, Math.PI * 2);
+        ctx.arc(8, -3, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+    } else {
+
+        ctx.fillStyle = "#8e62e8";
+
+        ctx.beginPath();
+        ctx.moveTo(0, -28);
+        ctx.lineTo(25, 0);
+        ctx.lineTo(0, 28);
+        ctx.lineTo(-25, 0);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    /* eyes */
+
+    ctx.fillStyle = "#ff3d3d";
+
+    ctx.beginPath();
+    ctx.arc(-8, -5, 3, 0, Math.PI * 2);
+    ctx.arc(8, -5, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* boss crown */
+
+    if(e.kind === "boss"){
+
+        ctx.fillStyle = "#ffd83d";
+
+        ctx.beginPath();
+        ctx.moveTo(-20, -32);
+        ctx.lineTo(-12, -45);
+        ctx.lineTo(0, -35);
+        ctx.lineTo(12, -45);
+        ctx.lineTo(20, -32);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    /* HP BAR */
+
+    const barW =
+        e.kind === "boss" ? 90 :
+        e.kind === "mini" ? 65 : 45;
+
+    ctx.fillStyle = "#280b0b";
+    ctx.fillRect(-barW / 2, -45, barW, 6);
+
+    ctx.fillStyle = e.kind === "boss" ? "#ff3040" : "#55ff68";
+
+    ctx.fillRect(
+        -barW / 2,
+        -45,
+        barW * Math.max(0, e.hp / e.maxHp),
+        6
+    );
+
+    /* label */
+
+    if(e.kind !== "normal"){
+
+        ctx.font = "bold 10px Arial";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#fff";
+
+        ctx.fillText(
+            e.kind === "boss" ? "BOSS" : "MINIBOSS",
+            0,
+            -52
+        );
+    }
+
+    /* hit feedback */
+
+    if(e.hit > 0){
+
+        ctx.globalAlpha = 0.7;
+        ctx.fillStyle = "#fff";
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 28, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    ctx.restore();
+}
+
+/* ================= PORTAL RENDERING ================= */
+
+function drawPortal(){
+
+    if(!game.portal) return;
+
+    const p = worldToScreen(
+        game.portal.x,
+        game.portal.y
+    );
+
+    const pulse =
+        1 + Math.sin(game.time / 180) * 0.15;
+
+    ctx.save();
+
+    ctx.translate(p.x, p.y);
+    ctx.scale(pulse, pulse);
+
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = "#b36cff";
+
+    ctx.strokeStyle = "#d98cff";
+    ctx.lineWidth = 7;
+
+    ctx.beginPath();
+    ctx.arc(0, 0, 38, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.strokeStyle = "#63eaff";
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    ctx.arc(0, 0, 25, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = "#fff";
+
+    ctx.font = "bold 12px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(
+        "PORTAL",
+        0,
+        60
+    );
+
+    ctx.restore();
+}
+
+/* ================= VISUAL EFFECTS ================= */
+
+function addEffect(x, y, type){
+
+    game.effects.push({
+        x,
+        y,
+        type,
+        life: 0,
+        maxLife: 500
+    });
+}
+
+function drawEffects(){
+
+    for(let i = game.effects.length - 1; i >= 0; i--){
+
+        const e = game.effects[i];
+
+        e.life += 16;
+
+        if(e.life >= e.maxLife){
+            game.effects.splice(i, 1);
+            continue;
+        }
+
+        const p = worldToScreen(e.x, e.y);
+
+        const t = e.life / e.maxLife;
+
+        ctx.save();
+
+        ctx.translate(p.x, p.y);
+
+        ctx.globalAlpha = 1 - t;
+
+        const radius = 20 + t * 45;
+
+        if(e.type === "fire"){
+            ctx.strokeStyle = "#ff7a25";
+        } else if(e.type === "lightning"){
+            ctx.strokeStyle = "#ffff70";
+        } else if(e.type === "ice"){
+            ctx.strokeStyle = "#9ff5ff";
+        } else if(e.type === "dark"){
+            ctx.strokeStyle = "#b86cff";
+        } else if(e.type === "holy"){
+            ctx.strokeStyle = "#fff5a0";
+        } else {
+            ctx.strokeStyle = "#ffffff";
+        }
+
+        ctx.lineWidth = 5;
+
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+}
+
+/* ================= FLOATING DAMAGE TEXT ================= */
+
+function addFloating(x, y, text){
+
+    game.floating.push({
+        x,
+        y,
+        text,
+        life: 0
+    });
+}
+
+function drawFloating(){
+
+    for(let i = game.floating.length - 1; i >= 0; i--){
+
+        const f = game.floating[i];
+
+        f.life += 16;
+        f.y -= 0.5;
+
+        if(f.life > 900){
+            game.floating.splice(i, 1);
+            continue;
+        }
+
+        const p = worldToScreen(f.x, f.y);
+
+        ctx.save();
+
+        ctx.globalAlpha = 1 - f.life / 900;
+
+        ctx.font = "bold 15px Arial";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#fff";
+
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 3;
+
+        ctx.strokeText(f.text, p.x, p.y);
+        ctx.fillText(f.text, p.x, p.y);
+
+        ctx.restore();
+    }
+}
+
+/* ================= UTILITY ================= */
+
+function distance(a, b){
+    return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+/* ================= ATTACK SYSTEM ================= */
+
+function attack(){
+
+    if(!game || !game.running) return;
+    if(game.player.attackCooldown > 0) return;
+
+    game.player.attackCooldown = 350;
+    game.player.attackAnim = 180;
+
+    sound("attack");
+
+    const range = 75;
+    const damage = WEAPONS[game.weapon].damage;
+
+    let hitSomething = false;
+
+    for(const e of game.enemies){
+
+        if(e.hp <= 0) continue;
+
+        if(distance(game.player, e) <= range){
+
+            e.hp -= damage;
+            e.hit = 120;
+
+            addFloating(e.x, e.y - 35, "-" + damage);
+
+            addEffect(e.x, e.y, "attack");
+
+            hitSomething = true;
+
+            if(e.hp <= 0){
+                killEnemy(e);
+            }
+        }
+    }
+
+    if(!hitSomething){
+        addEffect(game.player.x, game.player.y, "attack");
+    }
+
+    updateUI();
+}
+
+/* ================= ENEMY DEATH HANDLER ================= */
+
+function killEnemy(e){
+
+    if(e.hp > 0) return;
+
+    game.gold +=
+        e.kind === "boss" ? 500 :
+        e.kind === "mini" ? 200 : 25;
+
+    if(e.kind === "mini"){
+
+        game.miniBossDead = true;
+
+        showMessage("🔥 MINIBOSS DEFEATED! +200 GOLD");
+        sound("boss");
+    }
+
+    if(e.kind === "boss"){
+
+        game.bossDead = true;
+
+        showMessage("👑 BOSS DEFEATED! PORTAL UNLOCKED!");
+        sound("boss");
+
+        game.portal = {
+            x: e.x,
+            y: e.y
+        };
+    }
+
+    updateUI();
+}
+
+/* ================= SKILL SYSTEM ================= */
+
+function useSkill(slot){
+
+    if(!game || !game.running) return;
+
+    const skillIndex = game.skillSlots[slot];
+    const skill = SKILLS[skillIndex];
+
+    if(!skill) return;
+
+    if(!game.unlockedSkills.includes(skillIndex)){
+        showMessage("🔒 Skill not yet unlocked!");
+        return;
+    }
+
+    if(game.skillCooldown[slot] > 0) return;
+
+    game.skillCooldown[slot] = skill.cooldown;
+
+    let range = 150;
+
+    if(
+        skill.type === "meteor" ||
+        skill.type === "void" ||
+        skill.type === "aruna"
+    ){
+        range = 190;
+    }
+
+    sound(
+        skill.type === "fire" ? "fire" :
+        skill.type === "lightning" ? "lightning" :
+        skill.type === "ice" ? "ice" : "attack"
+    );
+
+    addEffect(game.player.x, game.player.y, skill.type);
+
+    let target = null;
+    let best = Infinity;
+
+    for(const e of game.enemies){
+
+        if(e.hp <= 0) continue;
+
+        const d = distance(game.player, e);
+
+        if(d <= range && d < best){
+            best = d;
+            target = e;
+        }
+    }
+
+    if(target){
+
+        let damage =
+            skill.damage +
+            WEAPONS[game.weapon].damage * 0.35;
+
+        target.hp -= damage;
+        target.hit = 180;
+
+        addFloating(
+            target.x,
+            target.y - 40,
+            "-" + Math.floor(damage)
+        );
+
+        addEffect(target.x, target.y, skill.type);
+
+        if(target.hp <= 0){
+            killEnemy(target);
+        }
+    }
+
+    updateUI();
+}
+
+/* ================= PLAYER DAMAGE ================= */
+
+function damagePlayer(amount){
+
+    if(!game) return;
+    if(game.player.invincible > 0) return;
+
+    game.player.hp -= amount;
+    game.player.invincible = 700;
+
+    addFloating(
+        game.player.x,
+        game.player.y - 50,
+        "-" + Math.floor(amount)
+    );
+
+    if(game.player.hp <= 0){
+
+        game.player.hp = 0;
+        game.running = false;
+
+        document.getElementById("overlay").style.display = "flex";
+        document.getElementById("start").style.display = "none";
+        document.getElementById("restart").style.display = "block";
+
+        document.getElementById("menuText").textContent =
+            "💀 You have been defeated. Press RESTART to try again.";
+
+        showMessage("💀 GAME OVER");
+
+        updateUI();
+    }
+}
+
+/* ================= ENEMY AI ================= */
+
+function updateEnemies(dt){
+
+    for(const e of game.enemies){
+
+        if(e.hp <= 0) continue;
+
+        e.hit = Math.max(0, e.hit - dt);
+
+        const dx = game.player.x - e.x;
+        const dy = game.player.y - e.y;
+
+        const d = Math.hypot(dx, dy);
+
+        if(d > 48){
+
+            e.x += (dx / d) * e.speed * dt / 16;
+            e.y += (dy / d) * e.speed * dt / 16;
+
+        } else {
+
+            if(!e.attackTimer || e.attackTimer <= 0){
+
+                e.attackTimer =
+                    e.kind === "boss" ? 900 :
+                    e.kind === "mini" ? 1200 : 1500;
+
+                damagePlayer(
+                    e.kind === "boss" ? 12 :
+                    e.kind === "mini" ? 8 : 4
+                );
+            }
+        }
+
+        if(e.attackTimer > 0){
+            e.attackTimer -= dt;
+        }
+    }
+}
+
+/* ================= PORTAL UPDATE ================= */
+
+function updatePortal(){
+
+    if(!game.portal) return;
+
+    const d = distance(game.player, game.portal);
+
+    if(d < 65 && game.bossDead){
+
+        sound("portal");
+
+        if(game.map < MAPS.length - 1){
+
+            game.map++;
+
+            showMessage("🌌 ENTERING " + MAPS[game.map][0] + "!");
+            spawnMap();
+
+        } else {
+
+            game.running = false;
+
+            document.getElementById("overlay").style.display = "flex";
+            document.getElementById("start").style.display = "none";
+            document.getElementById("restart").style.display = "block";
+
+            document.getElementById("menuText").textContent =
+                "🏆 Congratulations! You have conquered the Realm of Aruna!";
+        }
+    }
+}
+
+/* ================= PLAYER MOVEMENT ================= */
+
+let joy = {
+    active: false,
+    x: 0,
+    y: 0,
+    id: null
+};
+
+const joystick = document.getElementById("joystick");
+const knob = document.getElementById("knob");
+
+function resetJoystick(){
+
+    joy.active = false;
+    joy.x = 0;
+    joy.y = 0;
+    joy.id = null;
+
+    knob.style.left = "50%";
+    knob.style.top = "50%";
+
+    if(game){
+        game.player.moving = false;
+    }
+}
+
+function updateJoystick(clientX, clientY){
+
+    const r = joystick.getBoundingClientRect();
+
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+
+    let dx = clientX - cx;
+    let dy = clientY - cy;
+
+    const max = r.width * 0.
