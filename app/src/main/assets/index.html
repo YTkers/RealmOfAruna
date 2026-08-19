@@ -82,6 +82,12 @@ canvas{
     background:linear-gradient(90deg,#15df62,#e6ff55);
 }
 
+#weaponName{
+    color:#ffe35b;
+    font-size:12px;
+    margin-top:3px;
+}
+
 #message{
     position:absolute;
     top:92px;
@@ -269,12 +275,6 @@ button{
     margin-top:10px;
 }
 
-#weaponName{
-    color:#ffe35b;
-    font-size:12px;
-    margin-top:3px;
-}
-
 @media(max-width:600px){
     #joystick{
         width:115px;
@@ -319,7 +319,7 @@ button{
         <div class="small" id="mapText">Map 1 — Verdant Plains</div>
         <div class="small">❤️ <span id="hpText">100/100</span></div>
         <div id="hpbar"><div id="hpfill"></div></div>
-        <div id="weaponName">⚔ Wood Sword</div>
+        <div class="small" id="weaponName">⚔ Wood Sword</div>
     </div>
 
     <div class="panel">
@@ -347,7 +347,6 @@ button{
         <button class="skill" id="skill1"></button>
         <button class="skill" id="skill2"></button>
     </div>
-
     <button id="attack">ATTACK</button>
 </div>
 
@@ -376,9 +375,7 @@ button{
 <script>
 "use strict";
 
-/* =========================================================
-   CANVAS
-========================================================= */
+/* ================= CANVAS ================= */
 
 const canvas=document.getElementById("canvas");
 const ctx=canvas.getContext("2d");
@@ -403,9 +400,7 @@ function resize(){
 addEventListener("resize",resize);
 resize();
 
-/* =========================================================
-   MAPS
-========================================================= */
+/* ================= MAPS ================= */
 
 const MAPS=[
 ["Verdant Plains","#31864c","Slime","🟢"],
@@ -430,9 +425,7 @@ const MAPS=[
 ["Aruna Throne","#3a204d","Royal Guard","👑"]
 ];
 
-/* =========================================================
-   20 SKILLS
-========================================================= */
+/* ================= 20 SKILLS ================= */
 
 const SKILLS=[
 {name:"Fireball",icon:"🔥",damage:25,cooldown:4000,type:"fire",price:80},
@@ -457,9 +450,7 @@ const SKILLS=[
 {name:"Aruna Burst",icon:"💠",damage:100,cooldown:14000,type:"aruna",price:700}
 ];
 
-/* =========================================================
-   WEAPONS
-========================================================= */
+/* ================= 30 WEAPONS ================= */
 
 const WEAPON_NAMES=[
 "Wood Sword","Iron Sword","Steel Sword","Bronze Axe","War Axe",
@@ -472,15 +463,13 @@ const WEAPON_NAMES=[
 ];
 
 const WEAPONS=WEAPON_NAMES.map((name,i)=>({
-    name,
+    name:name,
     damage:8+i*4,
     price:50+i*75,
     type:i%7
 }));
 
-/* =========================================================
-   GAME STATE
-========================================================= */
+/* ================= GAME ================= */
 
 let game=null;
 
@@ -522,9 +511,7 @@ function createGame(){
     };
 }
 
-/* =========================================================
-   AUDIO
-========================================================= */
+/* ================= AUDIO ================= */
 
 let audioCtx=null;
 
@@ -556,7 +543,7 @@ function sound(type){
         const now=audioCtx.currentTime;
 
         let f=300;
-        let end=0.12;
+        let end=.12;
         let wave="sine";
 
         if(type==="attack"){
@@ -580,7 +567,6 @@ function sound(type){
         if(type==="ice"){
             f=900;
             end=.18;
-            wave="sine";
         }
 
         if(type==="boss"){
@@ -592,7 +578,6 @@ function sound(type){
         if(type==="portal"){
             f=500;
             end=.5;
-            wave="sine";
         }
 
         if(type==="buy"){
@@ -608,25 +593,18 @@ function sound(type){
         );
 
         g.gain.setValueAtTime(.0001,now);
-        g.gain.exponentialRampToValueAtTime(
-            .16,
-            now+.01
-        );
-        g.gain.exponentialRampToValueAtTime(
-            .0001,
-            now+end
-        );
+        g.gain.exponentialRampToValueAtTime(.16,now+.01);
+        g.gain.exponentialRampToValueAtTime(.0001,now+end);
 
         o.start(now);
         o.stop(now+end+.02);
     }catch(e){}
 }
 
-/* =========================================================
-   START / RESTART
-========================================================= */
+/* ================= START / RESTART ================= */
 
 function startGame(){
+
     initAudio();
 
     game=createGame();
@@ -639,26 +617,32 @@ function startGame(){
     spawnMap();
     updateUI();
 
-    showMessage(
-        "⚔ MAP 1 DIMULAI!"
-    );
+    showMessage("⚔ MAP 1 DIMULAI!");
 }
 
-document.getElementById("start").onclick=function(e){
+document.getElementById("start").addEventListener("pointerup",function(e){
     e.preventDefault();
     e.stopPropagation();
     startGame();
-};
+});
 
-document.getElementById("restart").onclick=function(e){
+document.getElementById("restart").addEventListener("pointerup",function(e){
     e.preventDefault();
     e.stopPropagation();
     startGame();
-};
+});
 
-/* =========================================================
-   MESSAGE
-========================================================= */
+document.getElementById("start").addEventListener("click",function(e){
+    e.preventDefault();
+    e.stopPropagation();
+});
+
+document.getElementById("restart").addEventListener("click",function(e){
+    e.preventDefault();
+    e.stopPropagation();
+});
+
+/* ================= MESSAGE ================= */
 
 function showMessage(text){
     if(!game)return;
@@ -675,9 +659,7 @@ function showMessage(text){
     },2200);
 }
 
-/* =========================================================
-   MAP SPAWN
-========================================================= */
+/* ================= MAP SPAWN ================= */
 
 function spawnMap(){
 
@@ -705,14 +687,12 @@ function spawnMap(){
     updateUI();
 }
 
-/* =========================================================
-   ENEMY
-========================================================= */
+/* ================= ENEMY ================= */
 
 function spawnEnemy(kind){
 
-    let angle=Math.random()*Math.PI*2;
-    let radius=330+Math.random()*500;
+    const angle=Math.random()*Math.PI*2;
+    const radius=330+Math.random()*500;
 
     let hp=35+game.map*14;
     let speed=.55+Math.random()*.3;
@@ -733,18 +713,16 @@ function spawnEnemy(kind){
     game.enemies.push({
         x:Math.cos(angle)*radius,
         y:Math.sin(angle)*radius,
-        hp,
+        hp:hp,
         maxHp:hp,
-        speed,
-        kind,
-        size,
+        speed:speed,
+        kind:kind,
+        size:size,
         hit:0
     });
 }
 
-/* =========================================================
-   WORLD
-========================================================= */
+/* ================= WORLD ================= */
 
 function worldToScreen(x,y){
     return{
@@ -753,15 +731,9 @@ function worldToScreen(x,y){
     };
 }
 
-/* =========================================================
-   WORLD DRAW
-========================================================= */
-
 function drawWorld(){
 
-    const color=MAPS[game.map][1];
-
-    ctx.fillStyle=color;
+    ctx.fillStyle=MAPS[game.map][1];
     ctx.fillRect(0,0,W,H);
 
     ctx.globalAlpha=.12;
@@ -796,29 +768,16 @@ function drawWorld(){
 
         const p=worldToScreen(wx,wy);
 
-        if(
-            p.x<-30||
-            p.x>W+30||
-            p.y<-30||
-            p.y>H+30
-        )continue;
+        if(p.x<-30||p.x>W+30||p.y<-30||p.y>H+30)continue;
 
         ctx.fillStyle="rgba(255,255,255,.14)";
         ctx.beginPath();
-        ctx.arc(
-            p.x,
-            p.y,
-            3+(i%5)*2,
-            0,
-            Math.PI*2
-        );
+        ctx.arc(p.x,p.y,3+(i%5)*2,0,Math.PI*2);
         ctx.fill();
     }
 }
 
-/* =========================================================
-   PLAYER
-========================================================= */
+/* ================= PLAYER ================= */
 
 function drawPlayer(){
 
@@ -828,25 +787,16 @@ function drawPlayer(){
     );
 
     const moving=game.player.moving;
-    const walk=moving?
-        Math.sin(game.time/70)*7:0;
-
+    const walk=moving?Math.sin(game.time/70)*7:0;
     const dir=game.player.direction;
 
     ctx.save();
     ctx.translate(p.x,p.y);
 
-    /* shadow */
-
     ctx.fillStyle="#0008";
     ctx.beginPath();
-    ctx.ellipse(
-        0,28,27,9,
-        0,0,Math.PI*2
-    );
+    ctx.ellipse(0,28,27,9,0,0,Math.PI*2);
     ctx.fill();
-
-    /* legs */
 
     ctx.strokeStyle="#17243b";
     ctx.lineWidth=9;
@@ -855,12 +805,9 @@ function drawPlayer(){
     ctx.beginPath();
     ctx.moveTo(-8,10);
     ctx.lineTo(-10+walk,30);
-
     ctx.moveTo(8,10);
     ctx.lineTo(10-walk,30);
     ctx.stroke();
-
-    /* boots */
 
     ctx.strokeStyle="#0d1424";
     ctx.lineWidth=5;
@@ -868,12 +815,9 @@ function drawPlayer(){
     ctx.beginPath();
     ctx.moveTo(-10+walk,30);
     ctx.lineTo(-15+walk,31);
-
     ctx.moveTo(10-walk,30);
     ctx.lineTo(15-walk,31);
     ctx.stroke();
-
-    /* body */
 
     ctx.fillStyle="#278ee9";
     ctx.strokeStyle="#d8f6ff";
@@ -882,51 +826,27 @@ function drawPlayer(){
     ctx.fillRect(-15,-14,30,29);
     ctx.strokeRect(-15,-14,30,29);
 
-    /* arms */
-
-    let armSwing=moving?
-        Math.sin(game.time/70)*9:0;
+    const armSwing=moving?Math.sin(game.time/70)*9:0;
 
     ctx.strokeStyle="#ffd0aa";
     ctx.lineWidth=8;
 
     ctx.beginPath();
-
     ctx.moveTo(-15,-7);
-    ctx.lineTo(
-        -28,
-        -3-armSwing
-    );
-
+    ctx.lineTo(-28,-3-armSwing);
     ctx.moveTo(15,-7);
-    ctx.lineTo(
-        28,
-        -3+armSwing
-    );
-
+    ctx.lineTo(28,-3+armSwing);
     ctx.stroke();
 
-    /* head */
-
     ctx.fillStyle="#ffd0aa";
-
     ctx.beginPath();
     ctx.arc(0,-27,13,0,Math.PI*2);
     ctx.fill();
 
-    /* hair */
-
     ctx.fillStyle="#39231b";
-
     ctx.beginPath();
-    ctx.arc(
-        0,-31,13,
-        Math.PI,
-        Math.PI*2
-    );
+    ctx.arc(0,-31,13,Math.PI,Math.PI*2);
     ctx.fill();
-
-    /* face direction */
 
     ctx.fillStyle="#111";
 
@@ -948,13 +868,10 @@ function drawPlayer(){
         ctx.fillRect(-10,-39,20,5);
     }
 
-    /* weapon */
-
     drawWeapon(dir);
 
-    /* attack flash */
-
     if(game.player.attackAnim>0){
+
         ctx.strokeStyle="#fff5a0";
         ctx.lineWidth=5;
         ctx.shadowBlur=15;
@@ -978,16 +895,91 @@ function drawPlayer(){
     ctx.restore();
 }
 
-/* =========================================================
-   WEAPON DRAW
-========================================================= */
+/* ================= WEAPON DRAW ================= */
 
 function drawWeapon(dir){
 
     ctx.save();
 
-    ctx.strokeStyle="#dfe9ff";
-    ctx.lineWidth=5;
-    ctx.lineCap="round";
+    let angle=0;
 
-    const type=game.we
+    if(dir==="right")angle=0;
+    if(dir==="down")angle=Math.PI/2;
+    if(dir==="left")angle=Math.PI;
+    if(dir==="up")angle=-Math.PI/2;
+
+    ctx.translate(25,0);
+    ctx.rotate(angle);
+
+    const weapon=game.weapon;
+
+    if(weapon%5===0){
+
+        ctx.strokeStyle="#f2f2f2";
+        ctx.lineWidth=5;
+
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(32,0);
+        ctx.stroke();
+
+        ctx.strokeStyle="#8b5a2b";
+        ctx.lineWidth=4;
+
+        ctx.beginPath();
+        ctx.moveTo(-4,0);
+        ctx.lineTo(5,0);
+        ctx.stroke();
+
+    }else if(weapon%5===1){
+
+        ctx.strokeStyle="#bfc8d9";
+        ctx.lineWidth=7;
+
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(29,0);
+        ctx.stroke();
+
+        ctx.fillStyle="#d8a62c";
+        ctx.fillRect(-5,-4,7,8);
+
+    }else if(weapon%5===2){
+
+        ctx.strokeStyle="#dcecff";
+        ctx.lineWidth=3;
+
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(38,0);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(30,-6);
+        ctx.lineTo(38,0);
+        ctx.lineTo(30,6);
+        ctx.stroke();
+
+    }else if(weapon%5===3){
+
+        ctx.strokeStyle="#aab3c4";
+        ctx.lineWidth=6;
+
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(28,0);
+        ctx.stroke();
+
+        ctx.strokeStyle="#6b421f";
+        ctx.lineWidth=5;
+
+        ctx.beginPath();
+        ctx.moveTo(-5,-7);
+        ctx.lineTo(7,7);
+        ctx.stroke();
+
+    }else{
+
+        ctx.strokeStyle="#b9ffff";
+        ctx.lineWidth=6;
+        
