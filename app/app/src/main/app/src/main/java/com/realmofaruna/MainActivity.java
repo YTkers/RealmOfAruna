@@ -30,4 +30,4 @@ public class MainActivity extends Activity {
 
         setContentView(webView);
     }
-    }
+}
