@@ -1,1221 +1,3 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Realm Of Aruna</title>
-
-<style>
-*{
-    box-sizing:border-box;
-    user-select:none;
-    -webkit-user-select:none;
-    touch-action:none;
-}
-
-html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#07101c;
-    color:white;
-    font-family:Arial,sans-serif;
-}
-
-#game{
-    position:fixed;
-    inset:0;
-    overflow:hidden;
-}
-
-canvas{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-}
-
-#topUI{
-    position:absolute;
-    top:8px;
-    left:8px;
-    right:8px;
-    z-index:20;
-    display:flex;
-    justify-content:space-between;
-    pointer-events:none;
-}
-
-.panel{
-    background:rgba(3,10,25,.92);
-    border:2px solid #56ddff;
-    border-radius:14px;
-    padding:8px 11px;
-    text-shadow:0 2px 3px #000;
-}
-
-#title{
-    color:#72edff;
-    font-size:17px;
-    font-weight:900;
-}
-
-.small{
-    font-size:12px;
-    margin-top:3px;
-}
-
-#hpbar{
-    width:155px;
-    height:12px;
-    margin-top:5px;
-    border:1px solid white;
-    border-radius:10px;
-    overflow:hidden;
-    background:#451522;
-}
-
-#hpfill{
-    width:100%;
-    height:100%;
-    background:linear-gradient(90deg,#15df62,#eaff55);
-}
-
-#weaponName{
-    color:#ffe35b;
-    font-size:12px;
-    margin-top:3px;
-}
-
-#message{
-    position:absolute;
-    top:90px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:60;
-    max-width:90%;
-    padding:9px 14px;
-    border:2px solid #ffe15a;
-    border-radius:12px;
-    background:rgba(0,0,0,.9);
-    text-align:center;
-    font-weight:bold;
-    opacity:0;
-    transition:.2s;
-    pointer-events:none;
-}
-
-#message.show{
-    opacity:1;
-}
-
-/* MINI MAP */
-
-#miniMap{
-    position:absolute;
-    top:82px;
-    right:10px;
-    width:145px;
-    height:100px;
-    z-index:22;
-    border:2px solid #72eaff;
-    border-radius:10px;
-    background:rgba(0,10,25,.9);
-    overflow:hidden;
-}
-
-#miniCanvas{
-    width:100%;
-    height:100%;
-}
-
-/* JOYSTICK */
-
-#joystick{
-    position:absolute;
-    left:18px;
-    bottom:18px;
-    width:120px;
-    height:120px;
-    z-index:30;
-    border:3px solid #8cecff;
-    border-radius:50%;
-    background:rgba(55,110,155,.4);
-}
-
-#knob{
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:55px;
-    height:55px;
-    transform:translate(-50%,-50%);
-    border:3px solid white;
-    border-radius:50%;
-    background:#35caff;
-    box-shadow:0 0 18px #19caff;
-}
-
-/* BUTTONS */
-
-#buttons{
-    position:absolute;
-    right:10px;
-    bottom:14px;
-    z-index:30;
-    display:flex;
-    align-items:flex-end;
-    gap:7px;
-}
-
-button{
-    color:white;
-    font-family:Arial,sans-serif;
-    font-weight:900;
-    border:2px solid white;
-    -webkit-tap-highlight-color:transparent;
-}
-
-#attack{
-    width:78px;
-    height:78px;
-    border-radius:50%;
-    background:radial-gradient(circle,#ffe45c,#ff7a20,#d62222);
-    box-shadow:0 5px 18px #000b;
-}
-
-.skills{
-    display:flex;
-    gap:5px;
-}
-
-.skill{
-    position:relative;
-    width:55px;
-    height:55px;
-    border-radius:12px;
-    background:linear-gradient(#7d4cff,#24145e);
-    font-size:22px;
-}
-
-.skill b{
-    position:absolute;
-    top:2px;
-    left:5px;
-    font-size:9px;
-}
-
-.skill span{
-    position:absolute;
-    bottom:2px;
-    left:2px;
-    right:2px;
-    font-size:9px;
-}
-
-/* SHOP */
-
-#shopToggle{
-    position:absolute;
-    top:190px;
-    right:10px;
-    z-index:25;
-    padding:8px 11px;
-    border-radius:10px;
-    background:linear-gradient(#ffc936,#a94a00);
-}
-
-#shop{
-    position:absolute;
-    top:230px;
-    right:10px;
-    width:225px;
-    max-height:55vh;
-    overflow:auto;
-    z-index:26;
-    display:none;
-    padding:10px;
-    border:2px solid #ffd54d;
-    border-radius:13px;
-    background:rgba(5,15,35,.97);
-}
-
-.shopItem{
-    width:100%;
-    margin-top:5px;
-    padding:8px;
-    border-radius:8px;
-    background:#253e68;
-    font-size:11px;
-}
-
-/* BOSS BAR */
-
-#bossBar{
-    position:absolute;
-    left:50%;
-    bottom:112px;
-    transform:translateX(-50%);
-    width:min(420px,80%);
-    z-index:21;
-    display:none;
-    text-align:center;
-}
-
-#bossName{
-    font-weight:900;
-    color:#ff6b6b;
-    text-shadow:0 2px 4px black;
-}
-
-#bossHp{
-    height:12px;
-    border:2px solid white;
-    border-radius:10px;
-    overflow:hidden;
-    background:#321015;
-}
-
-#bossFill{
-    width:100%;
-    height:100%;
-    background:#e83245;
-}
-
-/* RESPONSIVE */
-
-@media(max-width:600px){
-
-    #miniMap{
-        width:125px;
-        height:88px;
-    }
-
-    #joystick{
-        width:110px;
-        height:110px;
-    }
-
-    #knob{
-        width:52px;
-        height:52px;
-    }
-
-    .skill{
-        width:50px;
-        height:50px;
-    }
-
-    #attack{
-        width:72px;
-        height:72px;
-    }
-
-    #hpbar{
-        width:125px;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<div id="game">
-
-<canvas id="canvas"></canvas>
-
-<div id="topUI">
-
-    <div class="panel">
-
-        <div id="title">
-            ⚔ REALM OF ARUNA
-        </div>
-
-        <div class="small" id="mapText">
-            Map 1 — Verdant Plains
-        </div>
-
-        <div class="small">
-            ❤️ <span id="hpText">100/100</span>
-        </div>
-
-        <div id="hpbar">
-            <div id="hpfill"></div>
-        </div>
-
-        <div id="weaponName">
-            ⚔ Wood Sword
-        </div>
-
-    </div>
-
-    <div class="panel">
-        💰 <span id="gold">150</span>
-    </div>
-
-</div>
-
-<div id="message"></div>
-
-<!-- MINI MAP -->
-
-<div id="miniMap">
-    <canvas id="miniCanvas"></canvas>
-</div>
-
-<!-- BOSS -->
-
-<div id="bossBar">
-
-    <div id="bossName">
-        👑 BOSS
-    </div>
-
-    <div id="bossHp">
-        <div id="bossFill"></div>
-    </div>
-
-</div>
-
-<!-- SHOP -->
-
-<button id="shopToggle">
-    🛒 SHOP
-</button>
-
-<div id="shop">
-
-    <b>⚔ WEAPON SHOP</b>
-
-    <div id="shopItems"></div>
-
-    <hr>
-
-    <b>✨ SKILL SHOP</b>
-
-    <div id="skillShop"></div>
-
-</div>
-
-<!-- JOYSTICK -->
-
-<div id="joystick">
-    <div id="knob"></div>
-</div>
-
-<!-- ATTACK / SKILLS -->
-
-<div id="buttons">
-
-    <div class="skills">
-
-        <button class="skill" id="skill0"></button>
-
-        <button class="skill" id="skill1"></button>
-
-        <button class="skill" id="skill2"></button>
-
-    </div>
-
-    <button id="attack">
-        ATTACK
-    </button>
-
-</div>
-
-</div>
-
-<script>
-"use strict";
-
-/* =====================================================
-   CANVAS
-===================================================== */
-
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
-
-const miniCanvas=document.getElementById("miniCanvas");
-const miniCtx=miniCanvas.getContext("2d");
-
-let W=innerWidth;
-let H=innerHeight;
-
-function resize(){
-
-    W=innerWidth;
-    H=innerHeight;
-
-    const d=Math.max(
-        1,
-        Math.min(2,devicePixelRatio||1)
-    );
-
-    canvas.width=W*d;
-    canvas.height=H*d;
-
-    canvas.style.width=W+"px";
-    canvas.style.height=H+"px";
-
-    ctx.setTransform(d,0,0,d,0,0);
-
-    miniCanvas.width=290;
-    miniCanvas.height=200;
-}
-
-addEventListener("resize",resize);
-resize();
-
-/* =====================================================
-   MAPS
-===================================================== */
-
-const MAPS=[
-
-["Verdant Plains","#31864c","Slime","🟢"],
-["Ember Valley","#873829","Fire Imp","👹"],
-["Frostfall","#3d7398","Ice Wolf","🐺"],
-["Storm Coast","#435f9e","Volt Bat","🦇"],
-["Moonlit Woods","#3d4b73","Shadow Cat","🐈"],
-["Crystal Caves","#6b4d98","Crystal Bug","🪲"],
-["Sunken Ruins","#397b7e","Aqua Ghoul","🧟"],
-["Ashen Fields","#604332","Ash Hound","🐕"],
-["Sky Islands","#537fae","Wind Hawk","🦅"],
-["Toxic Marsh","#54783a","Poison Frog","🐸"],
-["Golden Desert","#a77c31","Sand Scarab","🪲"],
-["Ancient Grove","#35653f","Treant","🌳"],
-["Obsidian Pass","#4c414d","Rock Golem","🗿"],
-["Starfall Valley","#505781","Astral Orb","🔮"],
-["Haunted Keep","#342e51","Wraith","👻"],
-["Dragonlands","#703331","Drake","🐲"],
-["Infernal Gate","#792728","Demon","😈"],
-["Celestial Fields","#657ba9","Seraph Guard","🪽"],
-["Void Frontier","#302350","Voidling","👾"],
-["Aruna Throne","#3a204d","Royal Guard","👑"]
-
-];
-
-/* =====================================================
-   SKILLS
-===================================================== */
-
-const SKILLS=[
-
-{name:"Fireball",icon:"🔥",damage:25,cooldown:4000},
-{name:"Lightning",icon:"⚡",damage:34,cooldown:5200},
-{name:"Ice Lance",icon:"❄️",damage:40,cooldown:6000},
-{name:"Wind Blade",icon:"🌪️",damage:28,cooldown:4500},
-{name:"Earth Spike",icon:"🪨",damage:47,cooldown:7000},
-{name:"Water Burst",icon:"💧",damage:32,cooldown:5200},
-{name:"Dark Bolt",icon:"🌑",damage:55,cooldown:7600},
-{name:"Holy Ray",icon:"✨",damage:60,cooldown:8200},
-{name:"Poison Nova",icon:"☠️",damage:38,cooldown:6500},
-{name:"Meteor",icon:"☄️",damage:78,cooldown:10500},
-{name:"Thunder Wave",icon:"🌩️",damage:50,cooldown:8000},
-{name:"Frost Nova",icon:"🧊",damage:58,cooldown:8500},
-{name:"Vine Lash",icon:"🌿",damage:42,cooldown:6200},
-{name:"Arcane Orb",icon:"🔮",damage:65,cooldown:9000},
-{name:"Flame Ring",icon:"🔥",damage:63,cooldown:8800},
-{name:"Soul Drain",icon:"💜",damage:48,cooldown:7200},
-{name:"Solar Spear",icon:"☀️",damage:72,cooldown:9800},
-{name:"Moon Beam",icon:"🌙",damage:68,cooldown:9300},
-{name:"Void Rift",icon:"🌀",damage:84,cooldown:11500},
-{name:"Aruna Burst",icon:"💠",damage:100,cooldown:14000}
-
-];
-
-/* =====================================================
-   WEAPONS
-===================================================== */
-
-const WEAPON_NAMES=[
-
-"Wood Sword",
-"Iron Sword",
-"Steel Sword",
-"Bronze Axe",
-"War Axe",
-"Twin Daggers",
-"Long Bow",
-"Crossbow",
-"Spear",
-"Halberd",
-"Mace",
-"Hammer",
-"Katana",
-"Greatsword",
-"Flame Blade",
-"Frost Blade",
-"Thunder Staff",
-"Wind Chakram",
-"Shadow Scythe",
-"Holy Staff",
-"Crystal Blade",
-"Poison Fang",
-"Meteor Hammer",
-"Dragon Slayer",
-"Void Blade",
-"Solar Spear",
-"Moon Staff",
-"Aruna Blade",
-"Royal Sword",
-"Legend Blade"
-
-];
-
-const WEAPONS=WEAPON_NAMES.map((name,i)=>({
-
-name:name,
-
-damage:8+i*5,
-
-price:50+i*75
-
-}));
-
-/* =====================================================
-   GAME STATE
-===================================================== */
-
-let game={
-
-map:0,
-
-gold:150,
-
-time:0,
-
-player:{
-
-x:0,
-y:0,
-
-hp:100,
-maxHp:100,
-
-speed:3.5,
-
-direction:"down",
-
-attackCooldown:0,
-
-attackAnim:0,
-
-invincible:0
-
-},
-
-enemies:[],
-
-effects:[],
-
-floating:[],
-
-portal:null,
-
-skillCooldown:[0,0,0],
-
-weapon:0,
-
-unlockedSkills:[0,1,2],
-
-over:false
-
-};
-
-/* =====================================================
-   JOYSTICK STATE
-===================================================== */
-
-let joy={
-
-active:false,
-
-x:0,
-y:0
-
-};
-
-const joystick=document.getElementById("joystick");
-const knob=document.getElementById("knob");
-
-function joystickMove(e){
-
-    const r=joystick.getBoundingClientRect();
-
-    const cx=r.left+r.width/2;
-    const cy=r.top+r.height/2;
-
-    let dx=e.clientX-cx;
-    let dy=e.clientY-cy;
-
-    const max=r.width*.38;
-
-    const len=Math.hypot(dx,dy);
-
-    if(len>max){
-
-        dx=dx/len*max;
-        dy=dy/len*max;
-
-    }
-
-    joy.x=dx/max;
-    joy.y=dy/max;
-
-    knob.style.left=
-        `calc(50% + ${dx}px)`;
-
-    knob.style.top=
-        `calc(50% + ${dy}px)`;
-}
-
-function joystickEnd(){
-
-    joy.active=false;
-    joy.x=0;
-    joy.y=0;
-
-    knob.style.left="50%";
-    knob.style.top="50%";
-}
-
-joystick.addEventListener("pointerdown",e=>{
-
-    e.preventDefault();
-
-    joy.active=true;
-
-    joystickMove(e);
-
-});
-
-addEventListener("pointermove",e=>{
-
-    if(joy.active){
-        joystickMove(e);
-    }
-
-});
-
-addEventListener("pointerup",joystickEnd);
-addEventListener("pointercancel",joystickEnd);
-
-/* =====================================================
-   MAP SPAWN
-===================================================== */
-
-function spawnMap(){
-
-    game.enemies=[];
-    game.effects=[];
-    game.floating=[];
-    game.portal=null;
-
-    game.player.x=0;
-    game.player.y=0;
-
-    game.player.hp=game.player.maxHp;
-
-    /*
-       SEMAKIN TINGGI MAP:
-       MUSUH SEMAKIN BANYAK
-    */
-
-    const count=
-        6+
-        game.map*2+
-        Math.floor(game.map/3);
-
-    for(let i=0;i<count;i++){
-
-        spawnEnemy("normal");
-
-    }
-
-    /*
-       MINI BOSS
-    */
-
-    spawnEnemy("mini");
-
-    /*
-       BOSS
-    */
-
-    spawnEnemy("boss");
-
-    updateUI();
-
-    showMessage(
-        "🗺️ MAP "+
-        (game.map+1)+
-        " — "+
-        MAPS[game.map][0]
-    );
-}
-
-/* =====================================================
-   SPAWN ENEMY
-===================================================== */
-
-function spawnEnemy(type){
-
-    const angle=
-        Math.random()*Math.PI*2;
-
-    const distance=
-        280+
-        Math.random()*600;
-
-    /*
-       LEVEL MAP MEMENGARUHI HP
-    */
-
-    let hp=
-        35+
-        game.map*22;
-
-    let speed=
-        .45+
-        Math.random()*.25+
-        game.map*.015;
-
-    let size=1;
-
-    if(type==="mini"){
-
-        hp*=4+
-            game.map*.15;
-
-        speed=.55+
-            game.map*.01;
-
-        size=1.4;
-
-    }
-
-    if(type==="boss"){
-
-        hp*=9+
-            game.map*.5;
-
-        speed=.32+
-            game.map*.008;
-
-        size=1.8;
-
-    }
-
-    game.enemies.push({
-
-        x:Math.cos(angle)*distance,
-
-        y:Math.sin(angle)*distance,
-
-        hp:hp,
-
-        maxHp:hp,
-
-        speed:speed,
-
-        type:type,
-
-        size:size,
-
-        hit:0
-
-    });
-
-}
-
-/* =====================================================
-   WORLD TO SCREEN
-===================================================== */
-
-function worldToScreen(x,y){
-
-    return{
-
-        x:W/2+
-            (x-game.player.x),
-
-        y:H/2+
-            (y-game.player.y)
-
-    };
-
-}
-
-/* =====================================================
-   DRAW WORLD
-===================================================== */
-
-function drawWorld(){
-
-    const map=MAPS[game.map];
-
-    ctx.fillStyle=map[1];
-
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        H
-    );
-
-    /*
-       GRID
-    */
-
-    ctx.globalAlpha=.12;
-
-    ctx.strokeStyle="#fff";
-
-    const grid=80;
-
-    const ox=
-        ((-game.player.x)%grid+grid)%grid;
-
-    const oy=
-        ((-game.player.y)%grid+grid)%grid;
-
-    for(let x=ox;x<W;x+=grid){
-
-        ctx.beginPath();
-
-        ctx.moveTo(x,0);
-        ctx.lineTo(x,H);
-
-        ctx.stroke();
-
-    }
-
-    for(let y=oy;y<H;y+=grid){
-
-        ctx.beginPath();
-
-        ctx.moveTo(0,y);
-        ctx.lineTo(W,y);
-
-        ctx.stroke();
-
-    }
-
-    ctx.globalAlpha=1;
-
-    /*
-       DECORATION
-    */
-
-    for(let i=0;i<70;i++){
-
-        const wx=
-            ((i*197+game.map*91)%2800)-1400;
-
-        const wy=
-            ((i*137+game.map*51)%2000)-1000;
-
-        const p=
-            worldToScreen(wx,wy);
-
-        if(
-            p.x<-30||
-            p.x>W+30||
-            p.y<-30||
-            p.y>H+30
-        )continue;
-
-        ctx.fillStyle="rgba(255,255,255,.15)";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            p.x,
-            p.y,
-            3+(i%5),
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-    }
-
-}
-
-/* =====================================================
-   DRAW PLAYER
-===================================================== */
-
-function drawPlayer(){
-
-    const p=
-        worldToScreen(
-            game.player.x,
-            game.player.y
-        );
-
-    const moving=
-        Math.abs(joy.x)+Math.abs(joy.y)>.1;
-
-    const walk=
-        moving?
-        Math.sin(game.time/70)*6:
-        0;
-
-    ctx.save();
-
-    ctx.translate(
-        p.x,
-        p.y
-    );
-
-    /*
-       SHADOW
-    */
-
-    ctx.fillStyle="#0008";
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        0,
-        29,
-        27,
-        9,
-        0,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-    /*
-       LEGS
-    */
-
-    ctx.strokeStyle="#16243c";
-    ctx.lineWidth=9;
-    ctx.lineCap="round";
-
-    ctx.beginPath();
-
-    ctx.moveTo(-8,9);
-    ctx.lineTo(-10+walk,30);
-
-    ctx.moveTo(8,9);
-    ctx.lineTo(10-walk,30);
-
-    ctx.stroke();
-
-    /*
-       BODY
-    */
-
-    ctx.fillStyle="#278ee9";
-
-    ctx.strokeStyle="#d8f6ff";
-
-    ctx.lineWidth=2;
-
-    ctx.fillRect(
-        -15,
-        -14,
-        30,
-        29
-    );
-
-    ctx.strokeRect(
-        -15,
-        -14,
-        30,
-        29
-    );
-
-    /*
-       ARMS
-    */
-
-    ctx.strokeStyle="#ffd0aa";
-    ctx.lineWidth=8;
-
-    ctx.beginPath();
-
-    ctx.moveTo(-15,-7);
-    ctx.lineTo(-28,-3);
-
-    ctx.moveTo(15,-7);
-    ctx.lineTo(28,-3);
-
-    ctx.stroke();
-
-    /*
-       HEAD
-    */
-
-    ctx.fillStyle="#ffd0aa";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        0,
-        -27,
-        13,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-    /*
-       HAIR
-    */
-
-    ctx.fillStyle="#39231b";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        0,
-        -31,
-        13,
-        Math.PI,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-    /*
-       EYES
-    */
-
-    ctx.fillStyle="#111";
-
-    if(game.player.direction==="down"){
-
-        ctx.fillRect(-7,-29,3,3);
-        ctx.fillRect(5,-29,3,3);
-
-    }
-
-    if(game.player.direction==="right"){
-
-        ctx.fillRect(7,-29,3,3);
-
-    }
-
-    if(game.player.direction==="left"){
-
-        ctx.fillRect(-10,-29,3,3);
-
-    }
-
-    /*
-       WEAPON
-    */
-
-    drawWeapon();
-
-    /*
-       ATTACK EFFECT
-    */
-
-    if(game.player.attackAnim>0){
-
-        ctx.strokeStyle="#fff5a0";
-
-        ctx.lineWidth=5;
-
-        ctx.shadowBlur=15;
-
-        ctx.shadowColor="#fff";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            0,
-            0,
-            45,
-            -1.2,
-            1.2
-        );
-
-        ctx.stroke();
-
-    }
-
-    ctx.restore();
-
-}
-
-/* =====================================================
-   WEAPON
-===================================================== */
-
-function drawWeapon(){
-
-    ctx.save();
-
-    let angle=0;
-
-    if(game.player.direction==="right")
-        angle=0;
-
-    if(game.player.direction==="down")
-        angle=Math.PI/2;
-
-    if(game.player.direction==="left")
-        angle=Math.PI;
-
-    if(game.player.direction==="up")
-        angle=-Math.PI/2;
-
-    ctx.translate(20,0);
-
-    ctx.rotate(angle);
-
-    const w=
-        WEAPONS[game.weapon];
-
-    ctx.strokeStyle=
-        game.weapon>13?
-        "#9ffcff":
-        "#e9e9e9";
-
-    ctx.lineWidth=
-        game.weapon>20?
-        7:
-        5;
-
-    ctx.beginPath();
-
-    ctx.moveTo(0,0);
-    ctx.lineTo(
-        32+
-        Math.min(18,game.weapon),
-        0
-    );
-
-    ctx.stroke();
-
-    ctx.strokeStyle="#8b5a2b";
-
-    ctx.lineWidth=4;
-
-    ctx.beginPath();
-
-    ctx.moveTo(-5,-7);
-    ctx.lineTo(-5,7);
-
-    ctx.stroke();
-
-    ctx.restore();
-
-}
-
 /* =====================================================
    DRAW ENEMIES
 ===================================================== */
@@ -1224,27 +6,20 @@ function drawEnemies(){
 
     for(const e of game.enemies){
 
-        if(e.hp<=0)continue;
+        if(e.hp<=0) continue;
 
-        const p=
-            worldToScreen(
-                e.x,
-                e.y
-            );
+        const p=worldToScreen(e.x,e.y);
 
         if(
-            p.x<-100||
-            p.x>W+100||
-            p.y<-100||
+            p.x<-100 ||
+            p.x>W+100 ||
+            p.y<-100 ||
             p.y>H+100
-        )continue;
+        ) continue;
 
-        const s=
-            20*e.size;
+        const s=20*e.size;
 
-        /*
-           SHADOW
-        */
+        /* SHADOW */
 
         ctx.fillStyle="#0008";
 
@@ -1262,9 +37,7 @@ function drawEnemies(){
 
         ctx.fill();
 
-        /*
-           BODY
-        */
+        /* BODY */
 
         let color="#7ee35b";
 
@@ -1277,9 +50,9 @@ function drawEnemies(){
         ctx.fillStyle=color;
 
         ctx.strokeStyle=
-            e.type==="boss"?
-            "#ffd84d":
-            "#fff";
+            e.type==="boss"
+            ? "#ffd84d"
+            : "#ffffff";
 
         ctx.lineWidth=2;
 
@@ -1296,9 +69,7 @@ function drawEnemies(){
         ctx.fill();
         ctx.stroke();
 
-        /*
-           EYES
-        */
+        /* EYES */
 
         ctx.fillStyle="#111";
 
@@ -1306,4 +77,1029 @@ function drawEnemies(){
 
         ctx.arc(
             p.x-s*.3,
-            p.y-
+            p.y-s*.15,
+            s*.12,
+            0,
+            Math.PI*2
+        );
+
+        ctx.arc(
+            p.x+s*.3,
+            p.y-s*.15,
+            s*.12,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        /* BOSS CROWN */
+
+        if(e.type==="boss"){
+
+            ctx.font=`${s}px Arial`;
+            ctx.textAlign="center";
+            ctx.textBaseline="middle";
+
+            ctx.fillText(
+                "👑",
+                p.x,
+                p.y-s-12
+            );
+        }
+
+        /* HP BAR */
+
+        const barWidth=s*2;
+
+        ctx.fillStyle="#300";
+
+        ctx.fillRect(
+            p.x-barWidth/2,
+            p.y-s-10,
+            barWidth,
+            5
+        );
+
+        ctx.fillStyle=
+            e.type==="boss"
+            ? "#ff3045"
+            : "#35e35c";
+
+        ctx.fillRect(
+            p.x-barWidth/2,
+            p.y-s-10,
+            barWidth*Math.max(0,e.hp/e.maxHp),
+            5
+        );
+
+        /* HIT FLASH */
+
+        if(e.hit>0){
+
+            ctx.strokeStyle="#ffffff";
+            ctx.lineWidth=4;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                p.x,
+                p.y,
+                s+5,
+                0,
+                Math.PI*2
+            );
+
+            ctx.stroke();
+        }
+    }
+}
+
+
+/* =====================================================
+   UPDATE PLAYER
+===================================================== */
+
+function updatePlayer(dt){
+
+    const p=game.player;
+
+    if(game.over) return;
+
+    let dx=joy.x;
+    let dy=joy.y;
+
+    const len=Math.hypot(dx,dy);
+
+    if(len>0.05){
+
+        if(Math.abs(dx)>Math.abs(dy)){
+
+            p.direction=
+                dx>0
+                ? "right"
+                : "left";
+
+        }else{
+
+            p.direction=
+                dy>0
+                ? "down"
+                : "up";
+        }
+
+        p.x+=dx*p.speed*(dt/16.67);
+        p.y+=dy*p.speed*(dt/16.67);
+    }
+
+    if(p.attackCooldown>0)
+        p.attackCooldown-=dt;
+
+    if(p.attackAnim>0)
+        p.attackAnim-=dt;
+
+    if(p.invincible>0)
+        p.invincible-=dt;
+}
+
+
+/* =====================================================
+   UPDATE ENEMIES
+===================================================== */
+
+function updateEnemies(dt){
+
+    const p=game.player;
+
+    for(const e of game.enemies){
+
+        if(e.hp<=0) continue;
+
+        if(e.hit>0)
+            e.hit-=dt;
+
+        const dx=p.x-e.x;
+        const dy=p.y-e.y;
+
+        const dist=Math.hypot(dx,dy);
+
+        if(dist>45){
+
+            e.x+=
+                dx/dist*
+                e.speed*
+                (dt/16.67);
+
+            e.y+=
+                dy/dist*
+                e.speed*
+                (dt/16.67);
+
+        }else{
+
+            /* enemy menyerang player */
+
+            if(p.invincible<=0){
+
+                const damage=
+                    e.type==="boss"
+                    ? 12
+                    : e.type==="mini"
+                    ? 7
+                    : 3;
+
+                p.hp-=damage;
+
+                p.invincible=700;
+
+                updateUI();
+
+                if(p.hp<=0){
+
+                    p.hp=0;
+                    game.over=true;
+
+                    showMessage(
+                        "💀 GAME OVER — tekan ATTACK untuk mulai lagi"
+                    );
+                }
+            }
+        }
+    }
+}
+
+
+/* =====================================================
+   ATTACK
+===================================================== */
+
+function attack(){
+
+    if(game.over){
+
+        game.over=false;
+        spawnMap();
+
+        return;
+    }
+
+    const p=game.player;
+
+    if(p.attackCooldown>0)
+        return;
+
+    p.attackCooldown=450;
+    p.attackAnim=180;
+
+    let hitSomething=false;
+
+    for(const e of game.enemies){
+
+        if(e.hp<=0) continue;
+
+        const dx=e.x-p.x;
+        const dy=e.y-p.y;
+
+        const dist=Math.hypot(dx,dy);
+
+        if(dist>85) continue;
+
+        let valid=false;
+
+        if(p.direction==="right" && dx>0)
+            valid=true;
+
+        if(p.direction==="left" && dx<0)
+            valid=true;
+
+        if(p.direction==="down" && dy>0)
+            valid=true;
+
+        if(p.direction==="up" && dy<0)
+            valid=true;
+
+        if(!valid) continue;
+
+        const damage=
+            WEAPONS[game.weapon].damage;
+
+        e.hp-=damage;
+
+        e.hit=120;
+
+        game.floating.push({
+            x:e.x,
+            y:e.y-30,
+            text:"-"+damage,
+            life:700
+        });
+
+        hitSomething=true;
+
+        if(e.hp<=0){
+
+            const reward=
+                e.type==="boss"
+                ? 150
+                : e.type==="mini"
+                ? 50
+                : 10;
+
+            game.gold+=reward;
+
+            game.floating.push({
+                x:e.x,
+                y:e.y-50,
+                text:"+"+reward+" 💰",
+                life:1000
+            });
+        }
+    }
+
+    if(hitSomething)
+        updateUI();
+
+    checkMapClear();
+}
+
+
+/* =====================================================
+   SKILLS
+===================================================== */
+
+function useSkill(slot){
+
+    if(game.over) return;
+
+    const skillId=
+        game.unlockedSkills[slot];
+
+    if(skillId===undefined)
+        return;
+
+    const skill=SKILLS[skillId];
+
+    if(game.skillCooldown[slot]>0)
+        return;
+
+    game.skillCooldown[slot]=skill.cooldown;
+
+    let hit=false;
+
+    for(const e of game.enemies){
+
+        if(e.hp<=0) continue;
+
+        const dist=
+            Math.hypot(
+                e.x-game.player.x,
+                e.y-game.player.y
+            );
+
+        if(dist<=150){
+
+            e.hp-=skill.damage;
+            e.hit=180;
+
+            game.floating.push({
+
+                x:e.x,
+                y:e.y-35,
+
+                text:
+                    skill.icon+
+                    " -"+
+                    skill.damage,
+
+                life:800
+            });
+
+            hit=true;
+
+            if(e.hp<=0){
+
+                const reward=
+                    e.type==="boss"
+                    ? 150
+                    : e.type==="mini"
+                    ? 50
+                    : 10;
+
+                game.gold+=reward;
+            }
+        }
+    }
+
+    if(hit)
+        updateUI();
+
+    checkMapClear();
+}
+
+
+/* =====================================================
+   FLOATING DAMAGE
+===================================================== */
+
+function updateFloating(dt){
+
+    for(let i=game.floating.length-1;i>=0;i--){
+
+        const f=game.floating[i];
+
+        f.y-=0.03*dt;
+        f.life-=dt;
+
+        if(f.life<=0){
+
+            game.floating.splice(i,1);
+
+            continue;
+        }
+    }
+}
+
+
+function drawFloating(){
+
+    ctx.save();
+
+    ctx.textAlign="center";
+    ctx.font="bold 16px Arial";
+
+    for(const f of game.floating){
+
+        const p=
+            worldToScreen(
+                f.x,
+                f.y
+            );
+
+        ctx.globalAlpha=
+            Math.max(0,f.life/700);
+
+        ctx.fillStyle="#fff45c";
+
+        ctx.fillText(
+            f.text,
+            p.x,
+            p.y
+        );
+    }
+
+    ctx.restore();
+}
+
+
+/* =====================================================
+   SKILL COOLDOWN
+===================================================== */
+
+function updateSkillCooldown(dt){
+
+    for(let i=0;i<game.skillCooldown.length;i++){
+
+        if(game.skillCooldown[i]>0){
+
+            game.skillCooldown[i]-=dt;
+
+            if(game.skillCooldown[i]<0)
+                game.skillCooldown[i]=0;
+        }
+    }
+
+    updateSkillButtons();
+}
+
+
+/* =====================================================
+   SKILL BUTTON UI
+===================================================== */
+
+function updateSkillButtons(){
+
+    for(let i=0;i<3;i++){
+
+        const button=
+            document.getElementById("skill"+i);
+
+        const id=
+            game.unlockedSkills[i];
+
+        if(id===undefined){
+
+            button.textContent="🔒";
+
+            continue;
+        }
+
+        const skill=SKILLS[id];
+
+        const cd=
+            game.skillCooldown[i];
+
+        if(cd>0){
+
+            button.innerHTML=
+                `<b>${Math.ceil(cd/1000)}</b>`+
+                skill.icon;
+
+        }else{
+
+            button.innerHTML=
+                `<b>${i+1}</b>`+
+                skill.icon;
+        }
+    }
+}
+
+
+/* =====================================================
+   UI
+===================================================== */
+
+function updateUI(){
+
+    document.getElementById("gold").textContent=
+        Math.floor(game.gold);
+
+    document.getElementById("hpText").textContent=
+        Math.ceil(game.player.hp)+
+        "/"+
+        game.player.maxHp;
+
+    document.getElementById("hpfill").style.width=
+        Math.max(
+            0,
+            game.player.hp/game.player.maxHp*100
+        )+"%";
+
+    document.getElementById("mapText").textContent=
+        "Map "+
+        (game.map+1)+
+        " — "+
+        MAPS[game.map][0];
+
+    document.getElementById("weaponName").textContent=
+        "⚔ "+
+        WEAPONS[game.weapon].name;
+
+    updateBossBar();
+}
+
+
+/* =====================================================
+   BOSS BAR
+===================================================== */
+
+function updateBossBar(){
+
+    const boss=
+        game.enemies.find(
+            e=>e.type==="boss" && e.hp>0
+        );
+
+    const bar=
+        document.getElementById("bossBar");
+
+    if(!boss){
+
+        bar.style.display="none";
+
+        return;
+    }
+
+    bar.style.display="block";
+
+    document.getElementById("bossName").textContent=
+        "👑 "+MAPS[game.map][2]+" BOSS";
+
+    document.getElementById("bossFill").style.width=
+        Math.max(
+            0,
+            boss.hp/boss.maxHp*100
+        )+"%";
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+let messageTimer=null;
+
+function showMessage(text){
+
+    const el=
+        document.getElementById("message");
+
+    el.textContent=text;
+
+    el.classList.add("show");
+
+    clearTimeout(messageTimer);
+
+    messageTimer=setTimeout(()=>{
+
+        el.classList.remove("show");
+
+    },1800);
+}
+
+
+/* =====================================================
+   MINI MAP
+===================================================== */
+
+function drawMiniMap(){
+
+    const w=miniCanvas.width;
+    const h=miniCanvas.height;
+
+    miniCtx.clearRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+    /* background */
+
+    miniCtx.fillStyle="#061426";
+
+    miniCtx.fillRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+    /* map */
+
+    miniCtx.fillStyle=
+        MAPS[game.map][1];
+
+    miniCtx.fillRect(
+        15,
+        15,
+        w-30,
+        h-30
+    );
+
+    /* enemies */
+
+    for(const e of game.enemies){
+
+        if(e.hp<=0) continue;
+
+        let x=
+            w/2+
+            e.x/15;
+
+        let y=
+            h/2+
+            e.y/15;
+
+        x=Math.max(
+            5,
+            Math.min(w-5,x)
+        );
+
+        y=Math.max(
+            5,
+            Math.min(h-5,y)
+        );
+
+        miniCtx.fillStyle=
+            e.type==="boss"
+            ? "#ff3030"
+            : e.type==="mini"
+            ? "#ffae22"
+            : "#70ff70";
+
+        miniCtx.beginPath();
+
+        miniCtx.arc(
+            x,
+            y,
+            e.type==="boss"
+            ? 7
+            : 4,
+            0,
+            Math.PI*2
+        );
+
+        miniCtx.fill();
+    }
+
+    /* player */
+
+    miniCtx.fillStyle="#36d8ff";
+
+    miniCtx.beginPath();
+
+    miniCtx.arc(
+        w/2,
+        h/2,
+        7,
+        0,
+        Math.PI*2
+    );
+
+    miniCtx.fill();
+}
+
+
+/* =====================================================
+   MAP CLEAR
+===================================================== */
+
+function checkMapClear(){
+
+    const alive=
+        game.enemies.some(
+            e=>e.hp>0
+        );
+
+    if(alive)
+        return;
+
+    if(!game.portal){
+
+        game.portal={
+            x:0,
+            y:-120
+        };
+
+        showMessage(
+            "✨ Semua musuh dikalahkan! Portal muncul!"
+        );
+    }
+}
+
+
+/* =====================================================
+   PORTAL
+===================================================== */
+
+function drawPortal(){
+
+    if(!game.portal)
+        return;
+
+    const p=
+        worldToScreen(
+            game.portal.x,
+            game.portal.y
+        );
+
+    ctx.save();
+
+    ctx.shadowBlur=25;
+    ctx.shadowColor="#d66cff";
+
+    ctx.strokeStyle="#e978ff";
+    ctx.lineWidth=6;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        p.x,
+        p.y,
+        35+
+        Math.sin(game.time/150)*5,
+        0,
+        Math.PI*2
+    );
+
+    ctx.stroke();
+
+    ctx.fillStyle="#b84cff55";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        p.x,
+        p.y,
+        25,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.restore();
+}
+
+
+/* =====================================================
+   PORTAL CHECK
+===================================================== */
+
+function updatePortal(){
+
+    if(!game.portal)
+        return;
+
+    const d=
+        Math.hypot(
+            game.player.x-game.portal.x,
+            game.player.y-game.portal.y
+        );
+
+    if(d<60){
+
+        if(game.map<MAPS.length-1){
+
+            game.map++;
+
+            spawnMap();
+
+        }else{
+
+            game.over=true;
+
+            showMessage(
+                "👑 SELAMAT! KAMU MENAMATKAN REALM OF ARUNA!"
+            );
+        }
+    }
+}
+
+
+/* =====================================================
+   SHOP
+===================================================== */
+
+function buildShop(){
+
+    const weaponShop=
+        document.getElementById("shopItems");
+
+    weaponShop.innerHTML="";
+
+    WEAPONS.forEach((w,i)=>{
+
+        const button=
+            document.createElement("button");
+
+        button.className="shopItem";
+
+        button.textContent=
+            w.name+
+            " — "+
+            w.price+
+            " 💰";
+
+        button.onclick=()=>{
+
+            if(i<=game.weapon){
+
+                showMessage(
+                    "⚔ Senjata ini sudah dimiliki"
+                );
+
+                return;
+            }
+
+            if(game.gold<w.price){
+
+                showMessage(
+                    "❌ Gold tidak cukup"
+                );
+
+                return;
+            }
+
+            game.gold-=w.price;
+            game.weapon=i;
+
+            updateUI();
+
+            showMessage(
+                "⚔ Membeli "+w.name
+            );
+        };
+
+        weaponShop.appendChild(button);
+    });
+
+
+    const skillShop=
+        document.getElementById("skillShop");
+
+    skillShop.innerHTML="";
+
+    SKILLS.forEach((skill,i)=>{
+
+        if(
+            game.unlockedSkills.includes(i)
+        ) return;
+
+        const button=
+            document.createElement("button");
+
+        button.className="shopItem";
+
+        const price=
+            100+i*100;
+
+        button.textContent=
+            skill.icon+
+            " "+
+            skill.name+
+            " — "+
+            price+
+            " 💰";
+
+        button.onclick=()=>{
+
+            if(game.gold<price){
+
+                showMessage(
+                    "❌ Gold tidak cukup"
+                );
+
+                return;
+            }
+
+            if(game.unlockedSkills.length>=3){
+
+                showMessage(
+                    "⚠️ Slot skill penuh"
+                );
+
+                return;
+            }
+
+            game.gold-=price;
+
+            game.unlockedSkills.push(i);
+
+            updateSkillButtons();
+            updateUI();
+
+            showMessage(
+                "✨ Skill "+
+                skill.name+
+                " dibeli!"
+            );
+        };
+
+        skillShop.appendChild(button);
+    });
+}
+
+
+/* =====================================================
+   SHOP BUTTON
+===================================================== */
+
+document.getElementById("shopToggle")
+.addEventListener("pointerdown",e=>{
+
+    e.preventDefault();
+
+    const shop=
+        document.getElementById("shop");
+
+    shop.style.display=
+        shop.style.display==="block"
+        ? "none"
+        : "block";
+});
+
+
+/* =====================================================
+   ATTACK BUTTON
+===================================================== */
+
+document.getElementById("attack")
+.addEventListener("pointerdown",e=>{
+
+    e.preventDefault();
+
+    attack();
+});
+
+
+/* =====================================================
+   SKILL BUTTONS
+===================================================== */
+
+for(let i=0;i<3;i++){
+
+    document
+        .getElementById("skill"+i)
+        .addEventListener(
+            "pointerdown",
+            e=>{
+
+                e.preventDefault();
+
+                useSkill(i);
+            }
+        );
+}
+
+
+/* =====================================================
+   GAME LOOP
+===================================================== */
+
+let lastTime=performance.now();
+
+function gameLoop(now){
+
+    const dt=
+        Math.min(
+            40,
+            now-lastTime
+        );
+
+    lastTime=now;
+
+    game.time=now;
+
+    updatePlayer(dt);
+
+    updateEnemies(dt);
+
+    updateFloating(dt);
+
+    updateSkillCooldown(dt);
+
+    updatePortal();
+
+    /* DRAW */
+
+    drawWorld();
+
+    drawPortal();
+
+    drawEnemies();
+
+    drawPlayer();
+
+    drawFloating();
+
+    drawMiniMap();
+
+    updateBossBar();
+
+    requestAnimationFrame(gameLoop);
+}
+
+
+/* =====================================================
+   START GAME
+===================================================== */
+
+buildShop();
+
+updateSkillButtons();
+
+spawnMap();
+
+requestAnimationFrame(gameLoop);
+    
