@@ -2,12 +2,14 @@ package com.realmofaruna
 
 import android.app.Activity
 import android.os.Bundle
-import android.graphics.Color
+import android.view.View
+import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.TextView
-import android.view.ViewGroup
+import android.widget.Toast
 
 class MainActivity : Activity() {
 
@@ -19,37 +21,69 @@ class MainActivity : Activity() {
         try {
             webView = WebView(this)
 
-            webView.settings.javaScriptEnabled = true
-            webView.settings.domStorageEnabled = true
-            webView.settings.databaseEnabled = true
-            webView.settings.allowFileAccess = true
-            webView.settings.allowContentAccess = true
+            webView.settings.apply {
+                javaScriptEnabled = true
+                domStorageEnabled = true
+                databaseEnabled = true
+                allowFileAccess = true
+                allowContentAccess = true
+                builtInZoomControls = false
+                displayZoomControls = false
+            }
 
-            webView.webViewClient = WebViewClient()
-            webView.webChromeClient = WebChromeClient()
+            webView.webViewClient = object : WebViewClient() {
+                override fun onReceivedError(
+                    view: WebView?,
+                    request: WebResourceRequest?,
+                    error: WebResourceError?
+                ) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Game gagal dimuat",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                override fun onRenderProcessGone(
+                    view: WebView?,
+                    detail: RenderProcessGoneDetail?
+                ): Boolean {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "WebView game crash",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return true
+                }
+            }
+
+            webView.webChromeClient = object : WebChromeClient() {
+                override fun onConsoleMessage(message: ConsoleMessage): Boolean {
+                    android.util.Log.d(
+                        "RealmOfAruna",
+                        message.message() + " @" + message.lineNumber()
+                    )
+                    return true
+                }
+            }
 
             setContentView(webView)
 
             webView.loadUrl("file:///android_asset/index.html")
 
         } catch (e: Exception) {
-            showError(e)
+            Toast.makeText(
+                this,
+                "ERROR: ${e.message}",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
-    private fun showError(e: Exception) {
-        val errorText = TextView(this)
-
-        errorText.setTextColor(Color.WHITE)
-        errorText.setBackgroundColor(Color.BLACK)
-        errorText.textSize = 16f
-        errorText.setPadding(30, 30, 30, 30)
-
-        errorText.text =
-            "REALM OF ARUNA ERROR\n\n" +
-            e.javaClass.name + "\n\n" +
-            (e.message ?: "Unknown error")
-
-        setContentView(errorText)
+    override fun onDestroy() {
+        if (::webView.isInitialized) {
+            webView.destroy()
+        }
+        super.onDestroy()
     }
 }
