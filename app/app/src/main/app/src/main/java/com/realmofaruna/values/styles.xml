@@ -1,0 +1,7 @@
+<? version="1.0" encoding="utf-8"?>
+<resources>
+    <style xmlname="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+</resources>
