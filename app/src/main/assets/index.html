@@ -1,1056 +1,173 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Realm Of Aruna</title>
-
 <style>
-*{
-    box-sizing:border-box;
-    user-select:none;
-    -webkit-user-select:none;
-}
-html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#070b12;
-    color:white;
-    font-family:Arial,sans-serif;
-    touch-action:none;
-}
-canvas{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-}
-#hud{
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-}
-#status{
-    position:absolute;
-    top:10px;
-    left:10px;
-    width:240px;
-    font-size:12px;
-    text-shadow:0 2px 4px #000;
-}
-.bar{
-    height:15px;
-    margin-bottom:5px;
-    border:2px solid #fff;
-    border-radius:10px;
-    background:#1b1b1b;
-    overflow:hidden;
-}
-#hp{
-    width:100%;
-    height:100%;
-    background:#e53935;
-}
-#xp{
-    width:0%;
-    height:100%;
-    background:#29b6f6;
-}
-#mapName{
-    position:absolute;
-    top:10px;
-    left:50%;
-    transform:translateX(-50%);
-    font-weight:bold;
-    text-shadow:0 2px 5px #000;
-}
-#weaponInfo{
-    position:absolute;
-    right:10px;
-    top:10px;
-    padding:8px 10px;
-    border:1px solid #aaa;
-    border-radius:9px;
-    background:rgba(0,0,0,.55);
-    font-size:12px;
-}
-#message{
-    position:absolute;
-    top:65px;
-    left:50%;
-    transform:translateX(-50%);
-    display:none;
-    min-width:240px;
-    text-align:center;
-    padding:10px 16px;
-    border-radius:12px;
-    border:2px solid #d6a7ff;
-    background:rgba(70,20,120,.88);
-    box-shadow:0 0 30px #9b4dff;
-    font-weight:bold;
-}
-#skills{
-    position:absolute;
-    left:50%;
-    bottom:12px;
-    transform:translateX(-50%);
-    display:flex;
-    gap:8px;
-}
-.skill{
-    width:68px;
-    height:68px;
-    border:2px solid #777;
-    border-radius:12px;
-    background:rgba(5,8,15,.85);
-    position:relative;
-    text-align:center;
-    padding-top:6px;
-    overflow:hidden;
-}
-.skill b{
-    display:block;
-    font-size:23px;
-}
-.skill small{
-    font-size:9px;
-}
-.cooldown{
-    position:absolute;
-    inset:0;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,.65);
-    font-size:17px;
-}
-#joystick{
-    position:absolute;
-    bottom:20px;
-    left:18px;
-    width:145px;
-    height:145px;
-    pointer-events:auto;
-}
-.jbtn{
-    position:absolute;
-    width:48px;
-    height:48px;
-    border:2px solid #888;
-    border-radius:50%;
-    background:rgba(255,255,255,.12);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-#up{left:48px;top:0}
-#down{left:48px;bottom:0}
-#left{left:0;top:48px}
-#right{right:0;top:48px}
-#attack{
-    position:absolute;
-    right:20px;
-    bottom:100px;
-    width:78px;
-    height:78px;
-    border-radius:50%;
-    border:3px solid #ff8a80;
-    background:rgba(220,40,40,.45);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    pointer-events:auto;
-    font-weight:bold;
-}
-#menu{
-    position:absolute;
-    right:15px;
-    bottom:18px;
-    padding:9px 12px;
-    border:1px solid #aaa;
-    border-radius:8px;
-    background:rgba(0,0,0,.7);
-    pointer-events:auto;
-}
-#panel{
-    display:none;
-    position:absolute;
-    inset:5%;
-    overflow:auto;
-    background:rgba(7,10,17,.97);
-    border:2px solid #666;
-    border-radius:15px;
-    padding:15px;
-    pointer-events:auto;
-}
-#close{
-    float:right;
-    padding:6px 12px;
-}
-.card{
-    display:inline-block;
-    vertical-align:top;
-    width:145px;
-    min-height:90px;
-    margin:4px;
-    padding:8px;
-    border:1px solid #4d5668;
-    border-radius:9px;
-    background:#151b26;
-    font-size:12px;
-}
-.card button{
-    margin-top:6px;
-    border:0;
-    border-radius:5px;
-    padding:5px 8px;
-    color:white;
-    background:#394963;
-}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07101d;font-family:Trebuchet MS,Arial,sans-serif;color:#fff}
+canvas{display:block;width:100%;height:100%;background:#102238}
+button{font:700 14px Trebuchet MS,Arial,sans-serif;color:#fff;border:1px solid #7ddcff;background:linear-gradient(#214a6e,#10283e);border-radius:10px;padding:9px 12px}
+button:active{transform:scale(.95)}
+#game{position:fixed;inset:0}
+#hud{position:absolute;left:10px;top:10px;z-index:5;width:min(330px,70vw);pointer-events:none}
+.bar{height:18px;background:#182231;border:2px solid #d8f4ff;border-radius:12px;overflow:hidden;margin-bottom:5px;box-shadow:0 0 8px #000}
+.fill{height:100%;width:100%;transition:width .15s}
+#hpFill{background:linear-gradient(90deg,#ff304f,#ff7b6b)}
+#mpFill{background:linear-gradient(90deg,#298cff,#9cddff)}
+#xpFill{background:linear-gradient(90deg,#b52dff,#f38cff)}
+#stats{font-size:14px;text-shadow:2px 2px 3px #000;line-height:20px}
+#mapName{font-size:18px;font-weight:900;color:#fff7a0;text-shadow:2px 2px 3px #000}
+#bossUI{position:absolute;left:50%;top:12px;transform:translateX(-50%);width:min(500px,72vw);display:none;text-align:center;z-index:5}
+#bossName{font-size:18px;font-weight:900;color:#ffd66b;text-shadow:2px 2px 3px #000}
+#bossBar{height:20px;background:#180c15;border:2px solid #ffd66b;border-radius:12px;overflow:hidden}
+#bossFill{height:100%;width:100%;background:linear-gradient(90deg,#ff164f,#ff9c34)}
+#skills{position:absolute;right:12px;bottom:16px;display:flex;gap:9px;z-index:7}
+.skill{width:76px;height:76px;border-radius:16px;position:relative;text-align:center;padding:7px;overflow:hidden}
+.skill .icon{font-size:30px;display:block}
+.skill .name{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skill .cd{position:absolute;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;font-size:20px;color:#fff}
+.skill.cooling .cd{display:flex}
+#joystick{position:absolute;left:24px;bottom:25px;width:135px;height:135px;border-radius:50%;background:rgba(90,180,255,.14);border:2px solid rgba(180,230,255,.5);z-index:8}
+#stick{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px;border-radius:50%;background:rgba(145,220,255,.55);border:2px solid #fff}
+#attack{position:absolute;right:215px;bottom:28px;width:70px;height:70px;border-radius:50%;z-index:8;background:linear-gradient(#b94c54,#5c1726);border-color:#ffaaa8}
+#interact{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);display:none;z-index:8}
+#hint{position:absolute;left:50%;top:55px;transform:translateX(-50%);z-index:10;background:rgba(5,12,25,.86);border:1px solid #76dfff;border-radius:12px;padding:10px 18px;text-align:center;font-weight:900;color:#fff;display:none;text-shadow:1px 1px 2px #000}
+#menu{position:absolute;right:10px;top:10px;z-index:10;display:flex;gap:6px}
+#panel{position:absolute;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(620px,94vw);max-height:85vh;overflow:auto;background:rgba(8,19,34,.97);border:2px solid #6bdcff;border-radius:18px;padding:16px;box-shadow:0 0 35px #000;display:none}
+#panel h2{margin:0 0 12px;color:#fff38c;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.card{background:linear-gradient(135deg,#173553,#0d2034);border:1px solid #4b9cc5;border-radius:12px;padding:9px;min-height:100px}
+.card b{display:block;color:#8fe9ff;margin-bottom:4px}
+.card small{display:block;color:#fff;font-size:11px;line-height:16px}
+.card button{margin-top:6px;width:100%;padding:6px;font-size:11px}
+#close{width:100%;margin-top:12px}
+#start{position:absolute;inset:0;z-index:50;background:radial-gradient(circle at center,#183f63,#050b14 70%);display:flex;align-items:center;justify-content:center;text-align:center}
+.startBox{width:min(600px,90vw)}
+.startBox h1{font-size:clamp(42px,11vw,90px);margin:0;color:#ffe878;text-shadow:0 5px 0 #6b371c,0 0 25px #ff9d32}
+.startBox p{font-size:17px;color:#d9f5ff}
+#toast{position:absolute;left:50%;bottom:115px;transform:translateX(-50%);z-index:30;background:rgba(0,0,0,.82);border:1px solid #ffd85e;border-radius:10px;padding:9px 15px;display:none;color:#fff}
 </style>
 </head>
-
 <body>
-
-<canvas id="game"></canvas>
+<div id="game">
+<canvas id="c"></canvas>
 
 <div id="hud">
+ <div id="mapName">Realm Of Aruna</div>
+ <div class="bar"><div id="hpFill" class="fill"></div></div>
+ <div class="bar"><div id="mpFill" class="fill"></div></div>
+ <div class="bar"><div id="xpFill" class="fill"></div></div>
+ <div id="stats">Lv 1 • HP 100/100 • Gold 100</div>
+</div>
 
-    <div id="status">
-        <div class="bar"><div id="hp"></div></div>
-        <div class="bar"><div id="xp"></div></div>
-        <div id="stats"></div>
-    </div>
+<div id="bossUI">
+ <div id="bossName"></div>
+ <div id="bossBar"><div id="bossFill"></div></div>
+</div>
 
-    <div id="mapName"></div>
+<div id="hint"></div>
+<div id="toast"></div>
 
-    <div id="weaponInfo"></div>
+<div id="menu">
+ <button onclick="openPanel('inventory')">🎒</button>
+ <button onclick="openPanel('weapons')">⚔</button>
+ <button onclick="openPanel('skills')">✨</button>
+</div>
 
-    <div id="message"></div>
+<div id="skills">
+ <button class="skill" id="s0" onclick="cast(0)"><span class="icon">🔥</span><span class="name">Fireball</span><span class="cd">0</span></button>
+ <button class="skill" id="s1" onclick="cast(1)"><span class="icon">⚡</span><span class="name">Lightning</span><span class="cd">0</span></button>
+ <button class="skill" id="s2" onclick="cast(2)"><span class="icon">❄️</span><span class="name">Ice Shard</span><span class="cd">0</span></button>
+</div>
 
-    <div id="skills">
-        <div class="skill" id="s0"><b>?</b><small>EMPTY</small><div class="cooldown"></div></div>
-        <div class="skill" id="s1"><b>?</b><small>EMPTY</small><div class="cooldown"></div></div>
-        <div class="skill" id="s2"><b>?</b><small>EMPTY</small><div class="cooldown"></div></div>
-    </div>
+<div id="joystick"><div id="stick"></div></div>
+<button id="attack" onclick="attack()">⚔</button>
+<button id="interact" onclick="interact()">ENTER PORTAL</button>
 
-    <div id="joystick">
-        <div class="jbtn" id="up">▲</div>
-        <div class="jbtn" id="down">▼</div>
-        <div class="jbtn" id="left">◀</div>
-        <div class="jbtn" id="right">▶</div>
-    </div>
+<div id="panel">
+ <h2 id="panelTitle"></h2>
+ <div id="panelContent"></div>
+ <button id="close" onclick="closePanel()">CLOSE</button>
+</div>
 
-    <div id="attack">ATTACK</div>
-    <div id="menu">🎒 MENU</div>
-
-    <div id="panel">
-        <button id="close">CLOSE</button>
-        <h2>Realm Of Aruna</h2>
-        <p id="panelStatus"></p>
-
-        <h3>⚔ Senjata</h3>
-        <div id="weaponList"></div>
-
-        <h3>✨ Skill</h3>
-        <div id="skillList"></div>
-    </div>
-
+<div id="start">
+ <div class="startBox">
+  <h1>REALM<br>OF ARUNA</h1>
+  <p>20 realms • 50 skills • 30 weapons • minibosses • bosses</p>
+  <button onclick="startGame()" style="font-size:20px;padding:15px 35px">START ADVENTURE</button>
+ </div>
+</div>
 </div>
 
 <script>
 "use strict";
 
-/* =========================================================
-   CANVAS
-========================================================= */
+const canvas=document.getElementById("c"),ctx=canvas.getContext("2d");
+let W=innerWidth,H=innerHeight,DPR=Math.min(devicePixelRatio||1,2);
+function resize(){W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+"px";canvas.style.height=H+"px";ctx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener("resize",resize);resize();
 
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
-
-let W=innerWidth;
-let H=innerHeight;
-
-function resize(){
-    W=canvas.width=innerWidth;
-    H=canvas.height=innerHeight;
-}
-addEventListener("resize",resize);
-resize();
-
-/* =========================================================
-   AUDIO
-========================================================= */
-
-let audioCtx=null;
-
-function audioInit(){
-    if(!audioCtx){
-        audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-    }
-}
-
-function beep(type){
-    audioInit();
-
-    const osc=audioCtx.createOscillator();
-    const gain=audioCtx.createGain();
-
-    const frequencies={
-        sword:180,
-        fire:220,
-        ice:700,
-        lightning:1000,
-        water:420,
-        wind:550,
-        earth:120,
-        shadow:160,
-        light:850,
-        arcane:500,
-        poison:260,
-        portal:1100,
-        boss:70,
-        pickup:800
-    };
-
-    osc.frequency.value=frequencies[type]||350;
-    osc.type=type==="arcane"?"sine":"square";
-
-    gain.gain.setValueAtTime(.10,audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(
-        .001,
-        audioCtx.currentTime+.2
-    );
-
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    osc.start();
-    osc.stop(audioCtx.currentTime+.22);
-}
-
-/* =========================================================
-   MAPS
-========================================================= */
-
-const MAPS=[
-    ["Verdant Meadow","#284d2b"],
-    ["Crystal Cave","#273b52"],
-    ["Ashen Valley","#4c2927"],
-    ["Frozen Wastes","#385568"],
-    ["Ancient Forest","#203b2b"],
-    ["Moonlit Swamp","#202e3e"],
-    ["Golden Desert","#67532b"],
-    ["Sunken Ruins","#393832"],
-    ["Storm Highlands","#37445d"],
-    ["Dark Cemetery","#252630"],
-    ["Volcanic Core","#48231c"],
-    ["Sky Islands","#596b82"],
-    ["Shadow Realm","#181322"],
-    ["Magma Fortress","#48251d"],
-    ["Dragon Valley","#512d28"],
-    ["Abyssal Sea","#163d47"],
-    ["Demon Lands","#351b34"],
-    ["Celestial Garden","#46552c"],
-    ["Forgotten Kingdom","#302c2b"],
-    ["Realm Of Aruna","#15142b"]
+const maps=[
+ ["Verdant Meadow","#397b3c","#79b957","Slime","Moss Guardian"],
+ ["Dark Forest","#183629","#315d42","Wolf","Forest Warden"],
+ ["Crystal Cave","#29345e","#675bb2","Crystal Bat","Crystal Titan"],
+ ["Frozen Valley","#294e73","#9cd9ff","Frost Wolf","Frost King"],
+ ["Volcanic Land","#582019","#b94725","Flame Imp","Volcanic Lord"],
+ ["Ancient Ruins","#4c4033","#857a60","Stone Golem","Ancient Colossus"],
+ ["Desert Kingdom","#9b7137","#d4aa54","Sand Scorpion","Sand Pharaoh"],
+ ["Poison Swamp","#244c35","#487344","Poison Frog","Swamp Hydra"],
+ ["Sky Island","#527aa0","#b7eaff","Sky Harpy","Storm Roc"],
+ ["Thunder Mountain","#303b62","#747ce0","Thunder Beast","Thunder Emperor"],
+ ["Shadow Realm","#17162b","#302957","Shadow Wraith","Shadow Overlord"],
+ ["Holy Sanctuary","#756c32","#d8cf7b","Holy Sentinel","Seraph Guardian"],
+ ["Ocean Temple","#174e70","#36a7bd","Aqua Serpent","Ocean Leviathan"],
+ ["Dragon Valley","#62342d","#a95236","Dragonling","Ancient Dragon"],
+ ["Demon Castle","#321a29","#6c2540","Demon Knight","Demon King"],
+ ["Arcane Library","#382b50","#6e55a0","Living Tome","Arcane Master"],
+ ["Moonlit Forest","#263c4a","#4e7d85","Moon Wolf","Lunar Beast"],
+ ["Celestial Realm","#3d3971","#867ed1","Astral Spirit","Celestial Judge"],
+ ["Void Dimension","#171522","#3a2850","Voidling","Void Destroyer"],
+ ["Realm of Aruna","#203b42","#65a99b","Aruna Beast","ARUNA SOVEREIGN"]
 ];
 
-/* =========================================================
-   ENEMY TYPES
-========================================================= */
-
-const ENEMY_TYPES=[
-    "slime",
-    "bat",
-    "wolf",
-    "scorpion",
-    "zombie",
-    "golem",
-    "treant",
-    "ghost",
-    "serpent",
-    "dragon",
-    "demon",
-    "knight",
-    "mushroom",
-    "spider",
-    "orc",
-    "elemental",
-    "vampire",
-    "kraken",
-    "titan",
-    "void"
+const skillNames=[
+["Fireball","🔥",35,5,700,"fire"],["Flame Burst","🔥",48,7,1000,"fire"],
+["Inferno","🔥",75,11,1800,"fire"],["Meteor","☄️",120,16,3200,"fire"],
+["Lightning Strike","⚡",55,6,900,"light"],["Thunder Storm","⚡",90,12,2200,"light"],
+["Ice Shard","❄️",32,4,650,"ice"],["Ice Nova","❄️",65,9,1500,"ice"],
+["Blizzard","❄️",110,15,2900,"ice"],["Wind Slash","🌪️",30,4,600,"wind"],
+["Tornado","🌪️",70,10,1700,"wind"],["Earth Spike","🪨",42,6,850,"earth"],
+["Rock Smash","🪨",60,8,1200,"earth"],["Earthquake","🌋",100,14,2500,"earth"],
+["Poison Dart","☠️",28,5,500,"poison"],["Poison Cloud","☠️",55,9,1300,"poison"],
+["Shadow Bolt","🌑",45,6,900,"dark"],["Shadow Explosion","🌑",85,12,2100,"dark"],
+["Holy Beam","✨",55,7,1100,"holy"],["Holy Nova","✨",90,12,2300,"holy"],
+["Arcane Missile","🔮",40,5,800,"arcane"],["Arcane Blast","🔮",85,11,1900,"arcane"],
+["Water Spear","💧",35,5,700,"water"],["Water Wave","🌊",65,9,1400,"water"],
+["Water Prison","💧",80,12,2000,"water"],["Wind Blade","🍃",50,7,1000,"wind"],
+["Wind Storm","🌪️",95,13,2300,"wind"],["Crystal Spike","💎",60,8,1300,"crystal"],
+["Dark Flame","🔥",72,10,1800,"dark"],["Soul Drain","👻",80,12,2200,"dark"],
+["Blood Slash","🩸",65,8,1500,"blood"],["Spirit Arrow","🏹",42,6,900,"spirit"],
+["Starfall","🌟",105,15,2800,"star"],["Moon Beam","🌙",75,10,1900,"moon"],
+["Solar Ray","☀️",110,15,3000,"solar"],["Chain Lightning","⚡",100,13,2500,"light"],
+["Frost Nova","❄️",75,10,1800,"ice"],["Flame Wave","🔥",90,12,2100,"fire"],
+["Meteor Rain","☄️",145,18,4000,"fire"],["Thunder Lance","⚡",100,13,2600,"light"],
+["Void Blast","🕳️",125,16,3500,"void"],["Gravity Crush","🌀",115,15,3200,"void"],
+["Time Slash","⏳",105,14,3000,"time"],["Phantom Strike","👻",95,12,2500,"dark"],
+["Dragon Breath","🐉",150,18,4500,"dragon"],["Dragon Roar","🐉",135,17,4200,"dragon"],
+["Sacred Sword","🗡️",125,15,3500,"holy"],["Demon Curse","😈",130,16,3800,"demon"],
+["Ragnarok","☄️",200,20,6000,"ultimate"],["Apocalypse","💥",250,25,8000,"ultimate"]
 ];
 
-const ENEMY_NAMES=[
-    "Slime",
-    "Bat",
-    "Wolf",
-    "Scorpion",
-    "Zombie",
-    "Golem",
-    "Treant",
-    "Ghost",
-    "Serpent",
-    "Dragon",
-    "Demon",
-    "Skeleton Knight",
-    "Mushroom",
-    "Spider",
-    "Orc",
-    "Elemental",
-    "Vampire",
-    "Kraken",
-    "Titan",
-    "Void Beast"
-];
-
-const MINI_NAMES=[
-    "King Slime",
-    "Blood Bat",
-    "Dire Alpha",
-    "Scorpion Queen",
-    "Grave Walker",
-    "Stone Guardian",
-    "Ancient Treant",
-    "Soul Reaper",
-    "Storm Serpent",
-    "Elder Wyrm",
-    "Demon Brute",
-    "Death Knight",
-    "Fungus Lord",
-    "Web Mother",
-    "Orc Chieftain",
-    "Primal Elemental",
-    "Vampire Count",
-    "Sea Horror",
-    "Mountain Titan",
-    "Void Hunter"
-];
-
-const BOSS_NAMES=[
-    "Slime Overlord",
-    "Vampire Lord",
-    "Fenrir",
-    "Scorpion Empress",
-    "Lich King",
-    "Earth Colossus",
-    "Forest God",
-    "Phantom King",
-    "Tempest Serpent",
-    "Ancient Dragon",
-    "Demon King",
-    "Death Emperor",
-    "Mycelium King",
-    "Spider Queen",
-    "Orc Warlord",
-    "Elemental Lord",
-    "Crimson Vampire",
-    "Kraken King",
-    "Titan Prime",
-    "Aruna's Destroyer"
-];
-
-/* =========================================================
-   SKILLS 50
-========================================================= */
-
-const ELEMENTS=[
-    "fire","ice","lightning","water","wind",
-    "earth","shadow","light","arcane","poison"
-];
-
-const SKILL_NAMES=[
-    "Fireball","Flame Burst","Meteor","Inferno","Fire Ring",
-    "Ice Bolt","Frost Nova","Ice Spear","Blizzard","Frozen Ring",
-    "Thunder","Lightning Chain","Storm Strike","Thunder Orb","Volt Cage",
-    "Water Shot","Tidal Wave","Water Ring","Aqua Spear","Flood",
-    "Wind Blade","Tornado","Gale Burst","Wind Cutter","Cyclone",
-    "Earth Spike","Rock Blast","Stone Wall","Earthquake","Meteor Rock",
-    "Shadow Bolt","Dark Nova","Shadow Blade","Void Pulse","Nightmare",
-    "Holy Bolt","Light Beam","Radiant Burst","Holy Ring","Solar Ray",
-    "Arcane Missile","Arcane Burst","Mana Storm","Mystic Orb","Rune Blast",
-    "Poison Dart","Venom Cloud","Toxic Ring","Plague Burst","Acid Rain"
-];
-
-const ICONS={
-    fire:"🔥",
-    ice:"❄️",
-    lightning:"⚡",
-    water:"💧",
-    wind:"🌪️",
-    earth:"🪨",
-    shadow:"🌑",
-    light:"✨",
-    arcane:"🔮",
-    poison:"☠️"
-};
-
-const COLOR={
-    fire:"#ff5722",
-    ice:"#81d4fa",
-    lightning:"#ffee58",
-    water:"#29b6f6",
-    wind:"#b2ff59",
-    earth:"#a1887f",
-    shadow:"#9c27b0",
-    light:"#fff59d",
-    arcane:"#ce93d8",
-    poison:"#76ff03"
-};
-
-const SKILLS=SKILL_NAMES.map((name,i)=>({
-    id:i,
-    name,
-    element:ELEMENTS[Math.floor(i/5)],
-    damage:22+i*2,
-    cooldown:4+(i%8)*.7
-}));
-
-/* =========================================================
-   WEAPONS 30
-========================================================= */
-
-const WEAPON_NAMES=[
-    "Wooden Blade",
-    "Iron Sword",
-    "Steel Sword",
-    "Fire Sword",
-    "Ice Sword",
-    "Thunder Blade",
-    "Wind Katana",
-    "Earth Hammer",
-    "Shadow Dagger",
-    "Holy Saber",
-    "Flame Axe",
-    "Frost Axe",
-    "Storm Axe",
-    "Poison Dagger",
-    "Crystal Blade",
-    "Moon Blade",
-    "Sun Blade",
-    "Demon Sword",
-    "Dragon Slayer",
-    "Void Edge",
-    "Arcane Staff",
-    "Fire Staff",
-    "Ice Staff",
-    "Thunder Staff",
-    "Wind Staff",
-    "Earth Staff",
-    "Shadow Staff",
-    "Holy Staff",
-    "Dragon Staff",
-    "Aruna Blade"
-];
-
-const WEAPON_ELEMENTS=[
-    "physical","physical","physical","fire","ice",
-    "lightning","wind","earth","shadow","light",
-    "fire","ice","lightning","poison","arcane",
-    "shadow","light","fire","fire","shadow",
-    "arcane","fire","ice","lightning","wind",
-    "earth","shadow","light","fire","arcane"
-];
-
-const WEAPON_ICONS=[
-    "⚔️","🗡️","⚔️","🔥","❄️",
-    "⚡","🌪️","🔨","🌑","✨",
-    "🪓","❄️","⚡","☠️","💎",
-    "🌙","☀️","👹","🐉","🌑",
-    "🔮","🔥","❄️","⚡","🌪️",
-    "🪨","🌑","✨","🐉","🌌"
-];
-
-const WEAPONS=WEAPON_NAMES.map((name,i)=>({
-    id:i,
-    name,
-    element:WEAPON_ELEMENTS[i],
-    icon:WEAPON_ICONS[i],
-    damage:15+i*4
-}));
-
-/* =========================================================
-   PLAYER
-========================================================= */
-
-const player={
-    x:0,
-    y:0,
-    vx:0,
-    vy:0,
-    speed:250,
-    radius:16,
-    hp:100,
-    maxHp:100,
-    level:1,
-    xp:0,
-    weapon:WEAPONS[0],
-    skills:[SKILLS[0],SKILLS[5],SKILLS[10]],
-    cooldown:[0,0,0],
-    attackCD:0,
-    attackAnim:0
-};
-
-/* =========================================================
-   WORLD
-========================================================= */
-
-const WORLD=5200;
-
-let mapIndex=0;
-let enemies=[];
-let particles=[];
-let portal=null;
-let miniDead=false;
-let bossDead=false;
-
-/* =========================================================
-   ENEMY SPAWN
-========================================================= */
-
-function createEnemy(type,x,y,kind="normal"){
-
-    let hp=50+mapIndex*12;
-
-    if(kind==="mini")
-        hp=450+mapIndex*80;
-
-    if(kind==="boss")
-        hp=1200+mapIndex*180;
-
-    enemies.push({
-        type,
-        kind,
-        x,
-        y,
-        vx:0,
-        vy:0,
-        hp,
-        maxHp:hp,
-        radius:
-            kind==="boss"?65:
-            kind==="mini"?42:
-            23,
-        attackTimer:0,
-        phase:Math.random()*10
-    });
-}
-
-function startMap(){
-
-    enemies=[];
-    particles=[];
-    portal=null;
-    miniDead=false;
-    bossDead=false;
-
-    player.x=0;
-    player.y=0;
-    player.hp=player.maxHp;
-
-    const type=ENEMY_TYPES[mapIndex];
-
-    for(let i=0;i<18+mapIndex;i++){
-
-        createEnemy(
-            type,
-            (Math.random()-.5)*WORLD,
-            (Math.random()-.5)*WORLD
-        );
-    }
-
-    createEnemy(
-        type,
-        -900,
-        -500,
-        "mini"
-    );
-
-    createEnemy(
-        type,
-        1100,
-        900,
-        "boss"
-    );
-
-    updateMapUI();
-}
-
-/* =========================================================
-   MAP UI
-========================================================= */
-
-function updateMapUI(){
-
-    document.getElementById("mapName").textContent=
-        "MAP "+(mapIndex+1)+
-        " — "+
-        MAPS[mapIndex][0];
-
-    document.body.style.background=
-        MAPS[mapIndex][1];
-}
-
-/* =========================================================
-   PARTICLES
-========================================================= */
-
-function particle(x,y,color,size=5,life=.5){
-
-    particles.push({
-        x,
-        y,
-        vx:(Math.random()-.5)*180,
-        vy:(Math.random()-.5)*180,
-        size,
-        color,
-        life,
-        max:life
-    });
-}
-
-function updateParticles(dt){
-
-    for(let i=particles.length-1;i>=0;i--){
-
-        const p=particles[i];
-
-        p.x+=p.vx*dt;
-        p.y+=p.vy*dt;
-
-        p.vx*=.98;
-        p.vy*=.98;
-
-        p.life-=dt;
-
-        if(p.life<=0)
-            particles.splice(i,1);
-    }
-}
-
-function drawParticles(){
-
-    for(const p of particles){
-
-        ctx.globalAlpha=p.life/p.max;
-
-        ctx.fillStyle=p.color;
-
-        ctx.beginPath();
-        ctx.arc(
-            p.x,
-            p.y,
-            p.size,
-            0,
-            Math.PI*2
-        );
-        ctx.fill();
-    }
-
-    ctx.globalAlpha=1;
-}
-
-/* =========================================================
-   ENEMY DRAWING
-========================================================= */
-
-function drawEnemy(e){
-
-    ctx.save();
-    ctx.translate(e.x,e.y);
-
-    const scale=
-        e.kind==="boss"?1.7:
-        e.kind==="mini"?1.35:
-        1;
-
-    ctx.scale(scale,scale);
-
-    const type=e.type;
-
-    /* shadow */
-
-    ctx.fillStyle="rgba(0,0,0,.35)";
-    ctx.beginPath();
-    ctx.ellipse(
-        0,
-        24,
-        28,
-        9,
-        0,
-        0,
-        Math.PI*2
-    );
-    ctx.fill();
-
-    /* slime */
-
-    if(type==="slime"){
-        ctx.fillStyle="#43d85c";
-        ctx.beginPath();
-        ctx.arc(0,5,25,Math.PI,0);
-        ctx.lineTo(25,17);
-        ctx.quadraticCurveTo(
-            0,35,
-            -25,17
-        );
-        ctx.closePath();
-        ctx.fill();
-        enemyEyes();
-    }
-
-    /* bat */
-
-    else if(type==="bat"){
-        ctx.fillStyle="#713ca5";
-
-        ctx.beginPath();
-        ctx.moveTo(0,0);
-        ctx.lineTo(-42,-22);
-        ctx.lineTo(-29,20);
-        ctx.lineTo(0,7);
-        ctx.lineTo(29,20);
-        ctx.lineTo(42,-22);
-        ctx.closePath();
-        ctx.fill();
-
-        enemyEyes();
-    }
-
-    /* wolf */
-
-    else if(type==="wolf"){
-
-        ctx.fillStyle="#9097a0";
-
-        ctx.beginPath();
-        ctx.ellipse(
-            0,7,30,18,
-            0,0,Math.PI*2
-        );
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(20,-5);
-        ctx.lineTo(40,-24);
-        ctx.lineTo(34,5);
-        ctx.fill();
-
-        enemyEyes();
-    }
-
-    /* scorpion */
-
-    else if(type==="scorpion"){
-
-        ctx.strokeStyle="#c27a31";
-        ctx.lineWidth=9;
-
-        ctx.beginPath();
-        ctx.arc(
-            0,
-            5,
-            22,
-            0,
-            Math.PI*2
-        );
-        ctx.stroke();
-
-        ctx.lineWidth=5;
-
-        for(let i=0;i<4;i++){
-
-            ctx.beginPath();
-
-            ctx.moveTo(-15,5);
-            ctx.lineTo(
-                -48,
-                -22+i*18
-            );
-
-            ctx.moveTo(15,5);
-            ctx.lineTo(
-                48,
-                -22+i*18
-            );
-
-            ctx.stroke();
-        }
-    }
-
-    /* zombie */
-
-    else if(type==="zombie"){
-
-        ctx.fillStyle="#6e8d6a";
-        ctx.fillRect(
-            -20,-4,40,42
-        );
-
-        ctx.fillStyle="#a4b794";
-
-        ctx.beginPath();
-        ctx.arc(
-            0,
-            -25,
-            18,
-            0,
-            Math.PI*2
-        );
-        ctx.fill();
-
-        enemyEyes();
-    }
-
-    /* golem */
-
-    else if(type==="golem"){
-
-        ctx.fillStyle="#777b83";
-
-        ctx.beginPath();
-        ctx.moveTo(-30,-28);
-        ctx.lineTo(30,-28);
-        ctx.lineTo(38,30);
-        ctx.lineTo(-38,30);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.strokeStyle="#aaa";
-        ctx.lineWidth=3;
-        ctx.stroke();
-
-        enemyEyes();
-    }
-
-    /* treant */
-
-    else if(type==="treant"){
-
-        ctx.fillStyle="#704627";
-        ctx.fillRect(
-            -16,-2,32,40
-        );
-
-        ctx.fillStyle="#2d8c43";
-
-        ctx.beginPath();
-        ctx.arc(
-            0,-27,
-            32,
-            0,
-            Math.PI*2
-        );
-        ctx.fill();
-
-        enemyEyes();
-    }
-
-    /* ghost */
-
-    else if(type==="ghost"){
-
-        ctx.globalAlpha=.7;
-        ctx.fillStyle="#d9efff";
-
-        ctx.beginPath();
-        ctx.arc(
-            0,-7,
-            25,
-            Math.PI,
-            0
-        );
-
-        ctx.lineTo(25,30);
-        ctx.lineTo(10,18);
-        ctx.lineTo(0,30);
-        ctx.lineTo(-10,18);
-        ctx.lineTo(-25,30);
-
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.globalAlpha=1;
-
-        enemyEyes();
-    }
-
-    /* serpent */
-
-    else if(type==="serpent"){
-
-        ctx.strokeStyle="#38ad5b";
-        ctx.lineWidth=14;
-
-        ctx.beginPath();
-
-        for(let i=0;i<80;i++){
-
-            const xx=-40+i;
-            const yy=
-                Math.sin(i*.17+
-                performance.now()/300)*10;
-
-            if(i===0)
-                ctx.moveTo(xx,yy);
-            else
-                ctx.lineTo(xx,yy);
-        }
-
-        ctx.stroke();
-
-        enemyEyes();
-    }
-
-    /* dragon */
-
-    else if(type==="dragon"){
-
-        ctx.fillStyle="#a82b32";
-
-        ctx.beginPath();
-        ctx.ellipse(
-            0,5,
-            35,22,
-            0,0,Math.PI*2
-        );
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(-20,-5);
-        ctx.lineTo(-70,-40);
-        ctx.lineTo(-45,13);
-
-        ctx.moveTo(20,-5);
-        ctx.lineTo(70,-40);
-        ctx.lineTo(45,13);
-
-        ctx.fill();
-
-        enemyEyes();
-    }
-
-    /* demon */
-
-    else if(type==="demon"){
-
-        ctx.fillStyle="#a52a35";
-        ctx.fillRect(
-            -24,-4,
-            48,45
-        );
-
-        ctx.beginPath();
-        ctx.arc(
-            0,-25,
-            23,
-            0,
-            Math.PI*2
-        );
-        ctx.fill();
-
-        ctx.beginPath()
+const weapons=[
+["Wooden Sword",15,8,"🪵","physical"],["Iron Sword",50,14,"⚔️","physical"],
+["Steel Sword",120,22,"⚔️","physical"],["Flame Sword",300,35,"🔥","fire"],
+["Ice Sword",350,38,"❄️","ice"],["Thunder Sword",500,45,"⚡","light"],
+["Shadow Blade",700,55,"🌑","dark"],["Holy Blade",850,62,"✨","holy"],
+["Crystal Sword",1000,70,"💎","crystal"],["Demon Blade",1400,82,"😈","demon"],
+["Dragon Slayer",2200,100,"🐉","dragon"],["Moon Blade",1800,88,"🌙","moon"],
+["Sun Blade",2000,95,"☀️","solar"],["Wind Katana",1100,73,"🍃","wind"],
+["Earth Hammer",900,68,"🔨","earth"],["War Axe",650,58,"🪓","physical"],
+["Blood Axe",1200,78,"🩸","blood"],["Crystal Spear",1300,80,"💎","crystal"],
+["Dragon Spear",2500,110,"🐉","dragon
