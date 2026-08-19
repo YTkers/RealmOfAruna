@@ -2,10 +2,12 @@ package com.realmofaruna
 
 import android.app.Activity
 import android.os.Bundle
+import android.graphics.Color
 import android.webkit.WebChromeClient
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.TextView
+import android.view.ViewGroup
 
 class MainActivity : Activity() {
 
@@ -14,29 +16,40 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        webView = WebView(this)
+        try {
+            webView = WebView(this)
 
-        webView.settings.apply {
-            javaScriptEnabled = true
-            domStorageEnabled = true
-            databaseEnabled = true
-            allowFileAccess = true
-            allowContentAccess = true
-            javaScriptCanOpenWindowsAutomatically = true
-            mediaPlaybackRequiresUserGesture = false
-            cacheMode = WebSettings.LOAD_DEFAULT
+            webView.settings.javaScriptEnabled = true
+            webView.settings.domStorageEnabled = true
+            webView.settings.databaseEnabled = true
+            webView.settings.allowFileAccess = true
+            webView.settings.allowContentAccess = true
+
+            webView.webViewClient = WebViewClient()
+            webView.webChromeClient = WebChromeClient()
+
+            setContentView(webView)
+
+            webView.loadUrl("file:///android_asset/index.html")
+
+        } catch (e: Exception) {
+            showError(e)
         }
-
-        webView.webViewClient = WebViewClient()
-        webView.webChromeClient = WebChromeClient()
-
-        setContentView(webView)
-
-        webView.loadUrl("file:///android_asset/index.html")
     }
 
-    override fun onDestroy() {
-        webView.destroy()
-        super.onDestroy()
+    private fun showError(e: Exception) {
+        val errorText = TextView(this)
+
+        errorText.setTextColor(Color.WHITE)
+        errorText.setBackgroundColor(Color.BLACK)
+        errorText.textSize = 16f
+        errorText.setPadding(30, 30, 30, 30)
+
+        errorText.text =
+            "REALM OF ARUNA ERROR\n\n" +
+            e.javaClass.name + "\n\n" +
+            (e.message ?: "Unknown error")
+
+        setContentView(errorText)
     }
 }
