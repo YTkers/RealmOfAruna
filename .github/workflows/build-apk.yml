@@ -1,53 +1,17 @@
-name: Build RealmOfAruna APK
-
-on:
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK
-        run: |
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
-
       - name: Build APK
         run: |
           gradle :app:assembleDebug --no-daemon
+
+      - name: Check source files
+        run: |
+          echo "===== MAIN ACTIVITY ====="
+          cat app/src/main/java/com/realmofaruna/MainActivity.java
+          echo "===== SEARCH TEXT LAMA ====="
+          grep -R "APK BERHASIL BERJALAN" . || true
+          echo "===== SEARCH WEBVIEW BARU ====="
+          grep -R "WEBVIEW BARU" app || true
 
       - name: Find APK
         run: |
           echo "Mencari APK..."
           find . -type f -name "*.apk" -print
-
-      - name: Prepare RealmOfAruna.apk
-        run: |
-          APK=$(find app/build/outputs -type f -name "*.apk" | head -n 1)
-          echo "APK ditemukan: $APK"
-          cp "$APK" RealmOfAruna.apk
-          ls -lh RealmOfAruna.apk
-
-      - name: Upload RealmOfAruna.apk
-        uses: actions/upload-artifact@v4
-        with:
-          name: RealmOfAruna-apk-${{ github.run_number }}
-          path: RealmOfAruna.apk
-          if-no-files-found: error
