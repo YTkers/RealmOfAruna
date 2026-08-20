@@ -1,1390 +1,578 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Realm of Aruna</title>
-
-<style>
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#080b12;
-  color:#fff;
-  font-family:Arial,sans-serif;
-  touch-action:none;
-}
-
-canvas{
-  position:fixed;
-  inset:0;
-  display:block;
-}
-
-button{
-  border:1px solid #71809c;
-  background:#26334c;
-  color:white;
-  padding:10px 14px;
-  border-radius:7px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-button:active{
-  transform:scale(.96);
-  background:#3d5276;
-}
-
-/* ================= START SCREEN ================= */
-
-#startScreen{
-  position:fixed;
-  inset:0;
-  z-index:1000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:
-    radial-gradient(circle at center,#2b3d58 0%,#101722 45%,#05070b 100%);
-}
-
-.startBox{
-  width:min(460px,92vw);
-  padding:25px;
-  text-align:center;
-  border:2px solid #687893;
-  border-radius:15px;
-  background:rgba(8,12,20,.94);
-  box-shadow:0 0 50px #000;
-}
-
-.logo{
-  font-size:42px;
-  font-weight:900;
-  color:#e8c86a;
-  text-shadow:
-    0 3px #3b2d0d,
-    0 0 20px rgba(232,200,106,.25);
-}
-
-.subtitle{
-  color:#aeb9cb;
-  margin:8px 0 20px;
-  font-size:14px;
-}
-
-.classTitle{
-  font-weight:bold;
-  margin-bottom:8px;
-  color:#e3e9f2;
-}
-
-.classGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-.classChoice{
-  min-height:65px;
-  font-size:15px;
-}
-
-.classChoice.selected{
-  border:2px solid #f0c95b;
-  background:#3d4b67;
-  box-shadow:0 0 15px rgba(240,201,91,.25);
-}
-
-.classDesc{
-  font-size:10px;
-  display:block;
-  margin-top:4px;
-  color:#aeb8ca;
-}
-
-#startButton{
-  width:100%;
-  margin-top:15px;
-  padding:13px;
-  font-size:17px;
-  background:#8a6723;
-  border-color:#e4bd56;
-}
-
-#loadButton{
-  width:100%;
-  margin-top:7px;
-}
-
-#startMessage{
-  min-height:18px;
-  margin-top:10px;
-  color:#e5bd58;
-  font-size:12px;
-}
-
-/* ================= GAME UI ================= */
-
-#gameUI{
-  position:fixed;
-  inset:0;
-  z-index:10;
-  pointer-events:none;
-  display:none;
-}
-
-.panel{
-  position:absolute;
-  background:rgba(9,13,22,.88);
-  border:1px solid #58647c;
-  border-radius:9px;
-  box-shadow:0 4px 18px rgba(0,0,0,.5);
-  padding:8px;
-}
-
-/* player info */
-
-#playerPanel{
-  top:8px;
-  left:8px;
-  width:255px;
-}
-
-.playerName{
-  font-size:14px;
-  font-weight:bold;
-  color:#f2d46d;
-}
-
-#stats{
-  font-size:11px;
-  color:#c3cbd8;
-  margin:3px 0;
-}
-
-.bar{
-  width:100%;
-  height:12px;
-  background:#181b22;
-  border:1px solid #555;
-  border-radius:7px;
-  overflow:hidden;
-  margin:3px 0;
-}
-
-.fill{
-  width:0%;
-  height:100%;
-}
-
-#hpBar{
-  background:#d83c43;
-}
-
-#mpBar{
-  background:#397de2;
-}
-
-#xpBar{
-  background:#d5a52e;
-}
-
-#gold{
-  font-size:11px;
-  color:#e7ca70;
-}
-
-/* minimap */
-
-#miniMapBox{
-  top:8px;
-  right:8px;
-  width:175px;
-  height:175px;
-  padding:4px;
-}
-
-#miniMap{
-  width:100%;
-  height:100%;
-  border-radius:6px;
-  background:#17231b;
-}
-
-/* quest */
-
-#questBox{
-  top:192px;
-  right:8px;
-  width:210px;
-  font-size:11px;
-}
-
-.questTitle{
-  color:#e9c75c;
-  font-weight:bold;
-  margin-bottom:4px;
-}
-
-#questText{
-  line-height:1.4;
-}
-
-/* area */
-
-#areaName{
-  position:absolute;
-  top:18px;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:20px;
-  font-weight:bold;
-  text-shadow:2px 2px #000;
-  opacity:0;
-  transition:opacity .3s;
-}
-
-/* messages */
-
-#messages{
-  position:absolute;
-  left:50%;
-  bottom:150px;
-  transform:translateX(-50%);
-  width:90%;
-  text-align:center;
-  font-size:13px;
-  text-shadow:2px 2px #000;
-}
-
-.message{
-  margin:3px;
-}
-
-/* skills */
-
-#skillBar{
-  position:absolute;
-  left:50%;
-  bottom:10px;
-  transform:translateX(-50%);
-  display:flex;
-  gap:5px;
-  pointer-events:auto;
-}
-
-.skillButton{
-  width:54px;
-  height:54px;
-  padding:2px;
-  font-size:9px;
-  background:rgba(14,19,30,.94);
-}
-
-.skillNumber{
-  display:block;
-  font-size:18px;
-  color:#f0cf63;
-}
-
-.skillName{
-  display:block;
-  font-size:8px;
-}
-
-/* joystick */
-
-#joystick{
-  position:absolute;
-  left:15px;
-  bottom:18px;
-  width:125px;
-  height:125px;
-  border-radius:50%;
-  border:2px solid rgba(255,255,255,.2);
-  background:rgba(255,255,255,.06);
-  pointer-events:auto;
-}
-
-#joystickKnob{
-  position:absolute;
-  width:55px;
-  height:55px;
-  left:33px;
-  top:33px;
-  border-radius:50%;
-  background:rgba(255,255,255,.22);
-  border:1px solid rgba(255,255,255,.25);
-}
-
-/* action buttons */
-
-#actionButtons{
-  position:absolute;
-  right:12px;
-  bottom:18px;
-  display:flex;
-  gap:7px;
-  pointer-events:auto;
-}
-
-.actionButton{
-  width:58px;
-  height:58px;
-  border-radius:50%;
-  padding:0;
-  font-size:21px;
-  background:rgba(25,31,45,.94);
-}
-
-/* menu */
-
-#menu{
-  position:absolute;
-  z-index:50;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width:min(420px,92vw);
-  max-height:80vh;
-  overflow:auto;
-  pointer-events:auto;
-  display:none;
-}
-
-#menu h2{
-  margin:3px 0 12px;
-  color:#e6c35d;
-}
-
-#menuContent{
-  margin-bottom:8px;
-}
-
-.menuItem{
-  padding:7px;
-  border-bottom:1px solid #3a4252;
-  font-size:13px;
-}
-
-.menuButton{
-  margin:2px;
-}
-
-/* mobile hint */
-
-#hint{
-  position:absolute;
-  left:50%;
-  bottom:1px;
-  transform:translateX(-50%);
-  font-size:9px;
-  color:#8792a5;
-}
-
-/* death */
-
-#deathScreen{
-  position:fixed;
-  inset:0;
-  z-index:500;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  background:rgba(40,0,0,.75);
-}
-
-.deathBox{
-  text-align:center;
-  background:#111722;
-  border:2px solid #9b4444;
-  border-radius:12px;
-  padding:25px;
-}
-
-/* desktop hide joystick */
-
-@media(min-width:800px){
-  #joystick{
-    opacity:.15;
-  }
-
-  #actionButtons{
-    opacity:.8;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Realm of Aruna</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #0b0e14;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      touch-action: none;
+      overflow: hidden;
+    }
+    #gameContainer {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      aspect-ratio: 9 / 16;
+      background: #1a1f2a;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      touch-action: none;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #2d3a4a;
+      touch-action: none;
+      cursor: crosshair;
+    }
+    #ui-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    #hud {
+      position: absolute;
+      top: 8px; left: 10px; right: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      color: #f0e9d0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.3px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    #hud span { background: rgba(10,14,23,0.65); padding: 2px 10px; border-radius: 30px; backdrop-filter: blur(2px); border: 1px solid rgba(255,215,120,0.15); }
+    #hpBarWrap, #xpBarWrap {
+      position: absolute;
+      left: 10px; right: 10px;
+      height: 12px;
+      background: rgba(0,0,0,0.7);
+      border-radius: 30px;
+      border: 1px solid #665c4a;
+      overflow: hidden;
+      box-shadow: inset 0 2px 3px rgba(0,0,0,0.6);
+      pointer-events: none;
+      z-index: 10;
+    }
+    #hpBarWrap { top: 42px; }
+    #xpBarWrap { top: 58px; }
+    #hpBar, #xpBar {
+      height: 100%;
+      width: 100%;
+      border-radius: 30px;
+      transition: width 0.1s ease;
+    }
+    #hpBar { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+    #xpBar { background: linear-gradient(90deg, #5b6abf, #8e9df0); }
+    #minimap {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      border: 2px solid #b89b7a;
+      background: rgba(15,20,30,0.8);
+      backdrop-filter: blur(3px);
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 20;
+      box-shadow: 0 0 0 1px #4d3e2b;
+    }
+    #minimap canvas {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+    }
+    #joystick-area {
+      position: absolute;
+      bottom: 20px; left: 20px;
+      width: 120px; height: 120px;
+      border-radius: 60px;
+      background: rgba(30,40,60,0.4);
+      backdrop-filter: blur(4px);
+      border: 2px solid rgba(255,215,120,0.3);
+      pointer-events: auto;
+      z-index: 30;
+      touch-action: none;
+    }
+    #joystick-knob {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 48px; height: 48px;
+      margin-left: -24px; margin-top: -24px;
+      border-radius: 30px;
+      background: radial-gradient(circle, #f5d79a, #bc8f5a);
+      border: 2px solid #ead2a0;
+      box-shadow: 0 0 15px rgba(255,200,100,0.3);
+      pointer-events: none;
+    }
+    #menu-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(8,10,18,0.88);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      pointer-events: auto;
+      padding: 20px;
+      text-align: center;
+      color: #f5e9d8;
+    }
+    #menu-overlay h1 {
+      font-size: 3.2rem;
+      letter-spacing: 6px;
+      background: linear-gradient(135deg, #f7d875, #c99f4a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(200,150,50,0.3);
+      margin-bottom: 8px;
+    }
+    #menu-overlay p { font-size: 1rem; opacity: 0.8; margin-bottom: 30px; }
+    .menu-btn {
+      background: #deae5b;
+      border: none;
+      color: #181c28;
+      font-weight: bold;
+      font-size: 1.4rem;
+      padding: 14px 50px;
+      border-radius: 60px;
+      margin: 8px 0;
+      width: 220px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #8f6a34;
+      transition: 0.05s linear;
+      touch-action: manipulation;
+      pointer-events: auto;
+      letter-spacing: 1px;
+    }
+    .menu-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #6b4d26; }
+    #skill-panel {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(5px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+      pointer-events: auto;
+      padding: 20px;
+    }
+    #skill-panel h2 { color: #f5d98e; font-size: 2rem; margin-bottom: 20px; text-shadow: 0 0 20px #b8860b; }
+    .skill-card {
+      background: #262d3e;
+      border: 2px solid #b6945a;
+      border-radius: 30px;
+      padding: 16px 24px;
+      margin: 8px 0;
+      width: 80%;
+      max-width: 300px;
+      color: #f0e3c6;
+      font-weight: bold;
+      font-size: 1.2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.1s;
+      box-shadow: 0 4px 0 #5f4d2c;
+      pointer-events: auto;
+      touch-action: manipulation;
+      background: linear-gradient(145deg, #2d354a, #1c212f);
+    }
+    .skill-card:active { transform: scale(0.96); }
+    .skill-desc { font-size: 0.8rem; opacity: 0.7; font-weight: normal; }
+    #gameOver {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(5,3,10,0.9);
+      backdrop-filter: blur(8px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 60;
+      pointer-events: auto;
+      color: #f0dcc0;
+    }
+    #gameOver h1 { font-size: 3.5rem; color: #d94f4f; text-shadow: 0 0 40px #a02020; }
+    #gameOver .stat { font-size: 1.1rem; margin: 4px 0; }
+    #gameOver .menu-btn { background: #7a5a3a; color: #f0e0c0; box-shadow: 0 6px 0 #4d3822; }
+    @media (max-width: 480px) {
+      #hud { font-size: 10px; gap: 3px; }
+      #hpBarWrap, #xpBarWrap { height: 10px; }
+      #joystick-area { width: 100px; height: 100px; bottom: 15px; left: 15px; }
+      #joystick-knob { width: 40px; height: 40px; margin-left: -20px; margin-top: -20px; }
+      #minimap { width: 56px; height: 56px; }
+    }
+  </style>
 </head>
-
 <body>
-
-<canvas id="gameCanvas"></canvas>
-
-<!-- ================= START SCREEN ================= -->
-
-<div id="startScreen">
-
-  <div class="startBox">
-
-    <div class="logo">REALM OF ARUNA</div>
-
-    <div class="subtitle">
-      Explore • Fight • Loot • Survive
-    </div>
-
-    <div class="classTitle">
-      Choose Your Class
-    </div>
-
-    <div class="classGrid">
-
-      <button class="classChoice selected" data-class="Warrior">
-        ⚔ Warrior
-        <span class="classDesc">
-          High HP & Defense
-        </span>
-      </button>
-
-      <button class="classChoice" data-class="Mage">
-        🔮 Mage
-        <span class="classDesc">
-          Powerful Magic
-        </span>
-      </button>
-
-      <button class="classChoice" data-class="Assassin">
-        🗡 Assassin
-        <span class="classDesc">
-          Fast & Critical
-        </span>
-      </button>
-
-      <button class="classChoice" data-class="Archer">
-        🏹 Archer
-        <span class="classDesc">
-          Ranged Damage
-        </span>
-      </button>
-
-    </div>
-
-    <button id="startButton">
-      START GAME
-    </button>
-
-    <button id="loadButton">
-      LOAD SAVED GAME
-    </button>
-
-    <div id="startMessage"></div>
-
+<div id="gameContainer">
+  <canvas id="gameCanvas"></canvas>
+  <div id="ui-overlay">
+    <div id="hud"><span id="hpText">❤️ 100</span><span id="levelText">Lv.1</span><span id="waveText">🌊 1</span><span id="killText">💀 0</span><span id="timerText">⏱ 0s</span></div>
+    <div id="hpBarWrap"><div id="hpBar" style="width:100%"></div></div>
+    <div id="xpBarWrap"><div id="xpBar" style="width:0%"></div></div>
+    <div id="minimap"><canvas id="minimapCanvas" width="70" height="70"></canvas></div>
+    <div id="joystick-area"><div id="joystick-knob"></div></div>
   </div>
-
+  <div id="skill-panel"><h2>⬆ LEVEL UP ⬆</h2><div id="skillOptions"></div></div>
+  <div id="gameOver"><h1>💀 YOU DIED</h1><div id="goStats"></div><button class="menu-btn" id="restartBtn">RESTART</button><button class="menu-btn" id="mainMenuBtn">MAIN MENU</button></div>
+  <div id="menu-overlay"><h1>REALM of ARUNA</h1><p>survive • upgrade • conquer</p><button class="menu-btn" id="playBtn">▶ PLAY</button><button class="menu-btn" id="upgradeBtn">⬆ UPGRADES</button><button class="menu-btn" id="settingsBtn">⚙ SETTINGS</button></div>
 </div>
-
-<!-- ================= GAME UI ================= -->
-
-<div id="gameUI">
-
-  <div id="playerPanel" class="panel">
-
-    <div class="playerName">
-      Toufiqul
-    </div>
-
-    <div id="stats">
-      Level 1 Warrior
-    </div>
-
-    <div class="bar">
-      <div id="hpBar" class="fill"></div>
-    </div>
-
-    <div class="bar">
-      <div id="mpBar" class="fill"></div>
-    </div>
-
-    <div class="bar">
-      <div id="xpBar" class="fill"></div>
-    </div>
-
-    <div id="gold">
-      Gold: 0
-    </div>
-
-  </div>
-
-  <div id="miniMapBox" class="panel">
-    <canvas id="miniMap"></canvas>
-  </div>
-
-  <div id="questBox" class="panel">
-
-    <div class="questTitle">
-      QUEST
-    </div>
-
-    <div id="questText">
-      Defeat monsters.
-    </div>
-
-  </div>
-
-  <div id="areaName"></div>
-
-  <div id="messages"></div>
-
-  <!-- skills -->
-
-  <div id="skillBar">
-
-    <button class="skillButton" data-skill="1">
-      <span class="skillNumber">1</span>
-      <span class="skillName">Skill</span>
-    </button>
-
-    <button class="skillButton" data-skill="2">
-      <span class="skillNumber">2</span>
-      <span class="skillName">Skill</span>
-    </button>
-
-    <button class="skillButton" data-skill="3">
-      <span class="skillNumber">3</span>
-      <span class="skillName">Skill</span>
-    </button>
-
-    <button class="skillButton" data-skill="4">
-      <span class="skillNumber">4</span>
-      <span class="skillName">Skill</span>
-    </button>
-
-  </div>
-
-  <!-- joystick -->
-
-  <div id="joystick">
-    <div id="joystickKnob"></div>
-  </div>
-
-  <!-- actions -->
-
-  <div id="actionButtons">
-
-    <button class="actionButton" id="attackButton">
-      ⚔
-    </button>
-
-    <button class="actionButton" id="potionButton">
-      🧪
-    </button>
-
-    <button class="actionButton" id="menuButton">
-      ☰
-    </button>
-
-  </div>
-
-  <div id="hint">
-    WASD • SPACE • 1-4 • E • I
-  </div>
-
-  <!-- menu -->
-
-  <div id="menu" class="panel">
-
-    <h2>REALM OF ARUNA</h2>
-
-    <div id="menuContent"></div>
-
-    <button class="menuButton" id="characterButton">
-      Character
-    </button>
-
-    <button class="menuButton" id="inventoryButton">
-      Inventory
-    </button>
-
-    <button class="menuButton" id="questButton">
-      Quest
-    </button>
-
-    <button class="menuButton" id="saveButton">
-      Save
-    </button>
-
-    <button class="menuButton" id="closeMenuButton">
-      Close
-    </button>
-
-  </div>
-
-</div>
-
-<!-- ================= DEATH ================= -->
-
-<div id="deathScreen">
-
-  <div class="deathBox">
-
-    <h2>You Died</h2>
-
-    <p>
-      The world of Aruna has defeated you.
-    </p>
-
-    <button id="respawnButton">
-      Respawn
-    </button>
-
-  </div>
-
-</div>
-
 <script>
-"use strict";
+// ============================================================
+//  REALM OF ARUNA – Complete HTML5 Mobile Roguelike
+// ============================================================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const mmCanvas = document.getElementById('minimapCanvas');
+const mmCtx = mmCanvas.getContext('2d');
 
-/* =========================================================
-   BASIC SETUP
-========================================================= */
-
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-const miniMap = document.getElementById("miniMap");
-const mctx = miniMap.getContext("2d");
-
-let W = 0;
-let H = 0;
-
-function resizeCanvas(){
-
-  W = window.innerWidth;
-  H = window.innerHeight;
-
-  canvas.width = W;
-  canvas.height = H;
-
-  const rect = miniMap.getBoundingClientRect();
-
-  const dpr = Math.max(1,window.devicePixelRatio || 1);
-
-  miniMap.width = Math.max(1,Math.floor(rect.width*dpr));
-  miniMap.height = Math.max(1,Math.floor(rect.height*dpr));
-
+let W, H;
+function resize() {
+  const rect = document.getElementById('gameContainer').getBoundingClientRect();
+  canvas.width = rect.width * devicePixelRatio;
+  canvas.height = rect.height * devicePixelRatio;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  W = canvas.width; H = canvas.height;
 }
+resize();
+window.addEventListener('resize', resize);
 
-window.addEventListener("resize",resizeCanvas);
-
-resizeCanvas();
-
-/* =========================================================
-   WORLD
-========================================================= */
-
-const WORLD = {
-  width:4800,
-  height:3600
+// ---------- GAME STATE ----------
+const G = {
+  state: 'menu', // menu | playing | levelup | gameover
+  world: 0,
+  wave: 1,
+  kills: 0,
+  time: 0,
+  spawnTimer: 0,
+  enemies: [],
+  bullets: [],
+  particles: [],
+  xpOrbs: [],
+  skills: [],
+  // player
+  player: null,
+  // weapons
+  weapon: null,
+  // upgrade coins
+  coins: 0,
+  // persistent upgrades
+  perm: { maxHp: 100, damage: 10, fireRate: 1, speed: 2.5, crit: 0.05, xpBonus: 0 },
 };
 
-const areas = [
+// ---------- UTILITY ----------
+function rand(min, max) { return Math.random() * (max - min) + min; }
+function randI(min, max) { return Math.floor(rand(min, max+1)); }
+function dist(a,b) { return Math.hypot(a.x-b.x, a.y-b.y); }
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+function lerp(a,b,t) { return a + (b-a)*t; }
 
-  {
-    name:"Aruna Village",
-    x:0,
-    y:0,
-    w:1200,
-    h:900,
-    min:1,
-    max:5,
-    color:"#315d3a"
-  },
-
-  {
-    name:"Whispering Forest",
-    x:1200,
-    y:0,
-    w:1200,
-    h:1200,
-    min:5,
-    max:15,
-    color:"#214b31"
-  },
-
-  {
-    name:"Crimson Desert",
-    x:2400,
-    y:0,
-    w:1200,
-    h:1200,
-    min:15,
-    max:25,
-    color:"#805335"
-  },
-
-  {
-    name:"Frozen Valley",
-    x:3600,
-    y:0,
-    w:1200,
-    h:1200,
-    min:25,
-    max:40,
-    color:"#526f82"
-  },
-
-  {
-    name:"Shadow Swamp",
-    x:0,
-    y:1200,
-    w:1600,
-    h:1200,
-    min:40,
-    max:55,
-    color:"#293d3b"
-  },
-
-  {
-    name:"Ancient Ruins",
-    x:1600,
-    y:1200,
-    w:1600,
-    h:1200,
-    min:55,
-    max:70,
-    color:"#4c4844"
-  },
-
-  {
-    name:"Dragon Mountain",
-    x:3200,
-    y:1200,
-    w:1600,
-    h:1200,
-    min:70,
-    max:90,
-    color:"#522f30"
-  },
-
-  {
-    name:"Castle Aruna",
-    x:0,
-    y:2400,
-    w:4800,
-    h:1200,
-    min:90,
-    max:100,
-    color:"#363945"
+// ---------- PLAYER ----------
+class Player {
+  constructor() {
+    this.x = W/2; this.y = H/2;
+    this.radius = 18;
+    this.speed = G.perm.speed || 2.5;
+    this.maxHp = G.perm.maxHp || 100;
+    this.hp = this.maxHp;
+    this.xp = 0;
+    this.level = 1;
+    this.xpToNext = 20;
+    this.dir = 0; // radians
+    this.shootCooldown = 0;
+    this.alive = true;
+    this.hitFlash = 0;
+    this.weapon = new Weapon(this);
+    this.shieldHP = 0;
+    this.drone = null;
+    this.vampire = 0;
+    this.burnMult = 0;
+    this.critMult = 1.5;
+    this.bulletCount = 1;
+    this.pierce = 0;
+    this.explode = 0;
+    this.fireRate = G.perm.fireRate || 1;
+    this.damage = G.perm.damage || 10;
+    this.critChance = G.perm.crit || 0.05;
+    this.bulletSpeed = 8;
+    this.range = 400;
+    this.bulletSize = 4;
   }
-
-];
-
-/* =========================================================
-   MONSTERS
-========================================================= */
-
-const monsterTypes = [
-
-  {
-    name:"Slime",
-    color:"#63d36b",
-    base:1,
-    hp:45,
-    atk:7,
-    exp:15,
-    gold:5
-  },
-
-  {
-    name:"Wolf",
-    color:"#aaaaaa",
-    base:5,
-    hp:80,
-    atk:14,
-    exp:30,
-    gold:10
-  },
-
-  {
-    name:"Goblin",
-    color:"#76a846",
-    base:8,
-    hp:110,
-    atk:20,
-    exp:45,
-    gold:15
-  },
-
-  {
-    name:"Skeleton",
-    color:"#dddddd",
-    base:15,
-    hp:170,
-    atk:30,
-    exp:70,
-    gold:25
-  },
-
-  {
-    name:"Orc",
-    color:"#688c44",
-    base:30,
-    hp:350,
-    atk:50,
-    exp:140,
-    gold:50
-  },
-
-  {
-    name:"Dark Witch",
-    color:"#9b58c9",
-    base:45,
-    hp:500,
-    atk:75,
-    exp:220,
-    gold:80
-  },
-
-  {
-    name:"Undead Knight",
-    color:"#758099",
-    base:60,
-    hp:800,
-    atk:100,
-    exp:350,
-    gold:120
-  },
-
-  {
-    name:"Dragon",
-    color:"#d34d3e",
-    base:80,
-    hp:1800,
-    atk:180,
-    exp:1000,
-    gold:500
-  }
-
-];
-
-/* =========================================================
-   CLASS
-========================================================= */
-
-const classStats = {
-
-  Warrior:{
-    hp:160,
-    mp:60,
-    atk:18,
-    def:10,
-    crit:5
-  },
-
-  Mage:{
-    hp:90,
-    mp:150,
-    atk:28,
-    def:4,
-    crit:8
-  },
-
-  Assassin:{
-    hp:115,
-    mp:80,
-    atk:32,
-    def:6,
-    crit:18
-  },
-
-  Archer:{
-    hp:120,
-    mp:90,
-    atk:25,
-    def:6,
-    crit:12
-  }
-
-};
-
-const skillData = {
-
-  Warrior:[
-    ["Power Strike",15,1.7],
-    ["Shield Bash",20,1.5],
-    ["Whirlwind",30,1.2],
-    ["Earth Break",40,2.5]
-  ],
-
-  Mage:[
-    ["Fireball",20,2],
-    ["Ice Blast",25,2.2],
-    ["Lightning",35,3],
-    ["Meteor",50,4]
-  ],
-
-  Assassin:[
-    ["Shadow Dash",15,2],
-    ["Backstab",20,2.7],
-    ["Poison Strike",25,2.4],
-    ["Shadow Clone",40,4]
-  ],
-
-  Archer:[
-    ["Quick Shot",15,1.5],
-    ["Piercing Arrow",20,2],
-    ["Multi Shot",30,1.8],
-    ["Rain of Arrows",45,3]
-  ]
-
-};
-
-/* =========================================================
-   PLAYER
-========================================================= */
-
-function createPlayer(cls){
-
-  const s = classStats[cls];
-
-  return {
-
-    x:600,
-    y:450,
-
-    radius:18,
-
-    class:cls,
-
-    level:1,
-
-    exp:0,
-
-    gold:100,
-
-    hp:s.hp,
-    maxHp:s.hp,
-
-    mp:s.mp,
-    maxMp:s.mp,
-
-    atk:s.atk,
-    def:s.def,
-
-    crit:s.crit,
-
-    evil:0,
-
-    inventory:[
-      "Small HP Potion",
-      "Small HP Potion",
-      "Mana Potion"
-    ],
-
-    equipment:{
-      weapon:null,
-      armor:null
-    },
-
-    quest:{
-      kills:0,
-      active:true
-    },
-
-    attackCooldown:0
-
-  };
-
-}
-
-let player = createPlayer("Warrior");
-
-let gameStarted = false;
-
-let selectedClass = "Warrior";
-
-let enemies = [];
-let drops = [];
-let particles = [];
-
-let camera = {
-  x:0,
-  y:0
-};
-
-let keys = {};
-
-let joystickX = 0;
-let joystickY = 0;
-
-let currentArea = "";
-
-let bossSpawned = {};
-
-let lastTime = 0;
-
-/* =========================================================
-   START SCREEN
-========================================================= */
-
-const classButtons =
-  document.querySelectorAll(".classChoice");
-
-classButtons.forEach(button=>{
-
-  button.addEventListener("click",function(){
-
-    selectedClass = this.dataset.class;
-
-    classButtons.forEach(b=>{
-      b.classList.remove("selected");
-    });
-
-    this.classList.add("selected");
-
-    document.getElementById("startMessage").textContent =
-      selectedClass+" selected.";
-
-  });
-
-});
-
-document
-  .getElementById("startButton")
-  .addEventListener("click",function(){
-
-    startNewGame(selectedClass);
-
-  });
-
-document
-  .getElementById("loadButton")
-  .addEventListener("click",function(){
-
-    loadGame();
-
-  });
-
-function startNewGame(cls){
-
-  player = createPlayer(cls);
-
-  enemies = [];
-  drops = [];
-  particles = [];
-
-  bossSpawned = {};
-
-  currentArea = "";
-
-  gameStarted = true;
-
-  document
-    .getElementById("startScreen")
-    .style.display = "none";
-
-  document
-    .getElementById("gameUI")
-    .style.display = "block";
-
-  spawnInitialMonsters();
-
-  showMessage("Welcome to Realm of Aruna!");
-
-  showMessage("You are a "+cls+".");
-
-  showArea();
-
-  updateUI();
-
-  saveGameSilent();
-
-}
-
-function loadGame(){
-
-  const saved =
-    localStorage.getItem("realmOfArunaSave");
-
-  if(!saved){
-
-    document.getElementById("startMessage").textContent =
-      "No saved game found.";
-
-    return;
-
-  }
-
-  try{
-
-    const loaded = JSON.parse(saved);
-
-    if(!loaded || !loaded.class){
-
-      throw new Error("Invalid save");
-
+  takeDamage(dmg) {
+    if (this.shieldHP > 0) {
+      const blocked = Math.min(this.shieldHP, dmg);
+      this.shieldHP -= blocked;
+      dmg -= blocked;
+      if (dmg <= 0) return;
     }
-
-    player = loaded;
-
-    enemies = [];
-    drops = [];
-    particles = [];
-
-    bossSpawned = {};
-
-    currentArea = "";
-
-    gameStarted = true;
-
-    document
-      .getElementById("startScreen")
-      .style.display = "none";
-
-    document
-      .getElementById("gameUI")
-      .style.display = "block";
-
-    spawnInitialMonsters();
-
-    showMessage("Saved game loaded.");
-
-    updateUI();
-
-  }catch(error){
-
-    document.getElementById("startMessage").textContent =
-      "Save data is invalid.";
-
+    this.hp -= dmg;
+    this.hitFlash = 8;
+    if (this.hp <= 0) { this.hp = 0; this.alive = false; }
   }
-
-}
-
-/* =========================================================
-   SAVE
-========================================================= */
-
-function saveGameSilent(){
-
-  if(!gameStarted)return;
-
-  localStorage.setItem(
-    "realmOfArunaSave",
-    JSON.stringify(player)
-  );
-
-}
-
-function saveGame(){
-
-  saveGameSilent();
-
-  showMessage("Game saved.");
-
-}
-
-/* =========================================================
-   AREA
-========================================================= */
-
-function getAreaAt(x,y){
-
-  for(const area of areas){
-
-    if(
-      x>=area.x &&
-      x<area.x+area.w &&
-      y>=area.y &&
-      y<area.y+area.h
-    ){
-
-      return area;
-
+  getLevelXP() { return Math.floor(20 + this.level * 12); }
+  addXP(amount) {
+    this.xp += amount * (1 + G.perm.xpBonus);
+    while (this.xp >= this.getLevelXP()) {
+      this.xp -= this.getLevelXP();
+      this.level++;
+      this.xpToNext = this.getLevelXP();
+      showSkillChoices();
     }
-
   }
-
-  return areas[0];
-
+  update() {
+    if (!this.alive) return;
+    if (this.hitFlash > 0) this.hitFlash--;
+    if (this.shootCooldown > 0) this.shootCooldown -= 1/60;
+    // regen
+    if (this.hp < this.maxHp) this.hp = Math.min(this.maxHp, this.hp + 0.03);
+    // drone update
+    if (this.drone) {
+      const angle = Math.atan2(this.drone.y - this.y, this.drone.x - this.x);
+      const targetDist = 60;
+      const dx = this.x + Math.cos(angle)*targetDist - this.drone.x;
+      const dy = this.y + Math.sin(angle)*targetDist - this.drone.y;
+      this.drone.x += dx * 0.08;
+      this.drone.y += dy * 0.08;
+      // drone shoot
+      if (G.enemies.length > 0 && Math.random() < 0.04) {
+        const e = G.enemies.reduce((a,b) => dist(this.drone, a) < dist(this.drone, b) ? a : b);
+        if (e && dist(this.drone, e) < 500) {
+          const angleTo = Math.atan2(e.y - this.drone.y, e.x - this.drone.x);
+          const b = new Bullet(this.drone.x, this.drone.y, angleTo, 7, 8, 0.05, 1, 0, false);
+          G.bullets.push(b);
+        }
+      }
+    }
+  }
 }
 
-function getCurrentArea(){
-
-  return getAreaAt(player.x,player.y);
-
+// ---------- WEAPON ----------
+class Weapon {
+  constructor(player) {
+    this.player = player;
+    this.damage = player.damage;
+    this.fireRate = player.fireRate;
+    this.bulletSpeed = player.bulletSpeed;
+    this.range = player.range;
+    this.critChance = player.critChance;
+    this.critMult = player.critMult;
+    this.bulletSize = player.bulletSize || 4;
+    this.bulletCount = player.bulletCount || 1;
+    this.pierce = player.pierce || 0;
+    this.explode = player.explode || 0;
+  }
+  shoot(target) {
+    if (this.player.shootCooldown > 0) return;
+    const p = this.player;
+    const angle = Math.atan2(target.y - p.y, target.x - p.x);
+    p.dir = angle;
+    const count = this.bulletCount;
+    for (let i = 0; i < count; i++) {
+      let spread = 0;
+      if (count > 1) spread = (i / (count-1) - 0.5) * 0.5;
+      const a = angle + spread;
+      const b = new Bullet(p.x, p.y, a, this.bulletSpeed, this.damage, this.critChance, this.pierce, this.explode, false);
+      b.size = this.bulletSize;
+      b.range = this.range;
+      b.critMult = this.critMult;
+      G.bullets.push(b);
+    }
+    // muzzle particles
+    for (let i=0; i<6; i++) {
+      const a = angle + rand(-0.4, 0.4);
+      const sp = rand(2, 6);
+      G.particles.push({x: p.x+Math.cos(angle)*20, y: p.y+Math.sin(angle)*20, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life: 12, maxLife: 12, color: '#f5d742', size: rand(3,6)});
+    }
+    this.player.shootCooldown = 1 / (this.fireRate * 1.2);
+  }
 }
 
-function showArea(){
-
-  const area = getCurrentArea();
-
-  if(area.name === currentArea)return;
-
-  currentArea = area.name;
-
-  const areaElement =
-    document.getElementById("areaName");
-
-  areaElement.textContent =
-    area.name+
-    "  •  Lv."+area.min+"-"+area.max;
-
-  areaElement.style.opacity = "1";
-
-  setTimeout(()=>{
-
-    areaElement.style.opacity = "0";
-
-  },2500);
-
-  if(area.min>=15){
-
-    spawnBoss(area);
-
+// ---------- BULLET ----------
+class Bullet {
+  constructor(x, y, angle, speed, damage, crit, pierce, explode, isEnemy) {
+    this.x = x; this.y = y;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    this.angle = angle;
+    this.damage = damage;
+    this.crit = crit || 0;
+    this.pierce = pierce || 0;
+    this.explode = explode || 0;
+    this.isEnemy = isEnemy || false;
+    this.size = 4;
+    this.range = 400;
+    this.critMult = 1.5;
+    this.alive = true;
+    this.traveled = 0;
+    this.hit = [];
   }
-
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.traveled += Math.hypot(this.vx, this.vy);
+    if (this.traveled > this.range) this.alive = false;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.alive = false;
+  }
 }
 
-/* =========================================================
-   MONSTER SPAWN
-========================================================= */
-
-function getMonsterForArea(area){
-
-  let possible =
-    monsterTypes.filter(monster=>
-      monster.base <= area.max+5 &&
-      monster.base >= Math.max(1,area.min-8)
-    );
-
-  if(possible.length===0){
-
-    possible = [monsterTypes[0]];
-
+// ---------- ENEMY / BOSS ----------
+class Enemy {
+  constructor(x, y, type, isBoss=false) {
+    this.x = x; this.y = y;
+    this.isBoss = isBoss;
+    this.type = type;
+    this.alive = true;
+    this.hitFlash = 0;
+    const base = G.wave;
+    const scale = 1 + (base-1) * 0.12;
+    if (isBoss) {
+      this.radius = 40;
+      this.hp = 120 * scale * 3;
+      this.maxHp = this.hp;
+      this.damage = 18 * scale;
+      this.speed = 1.2 * Math.min(scale, 2);
+      this.xpReward = 60 * scale;
+      this.color = '#b02f2f';
+      this.name = ['Goblin King','Dark Knight','Demon Lord','Ancient Dragon'][G.world % 4] || 'Boss';
+    } else {
+      const types = [
+        {name:'Slime', hp:20, dmg:6, speed:0.9, radius:16, color:'#5f9b6f', xp:8},
+        {name:'Goblin', hp:30, dmg:8, speed:1.6, radius:14, color:'#7d8a3a', xp:10},
+        {name:'Zombie', hp:40, dmg:10, speed:1.2, radius:18, color:'#4f6d5a', xp:12},
+        {name:'Wolf', hp:25, dmg:12, speed:2.4, radius:14, color:'#8b7a6a', xp:11},
+        {name:'Skeleton', hp:35, dmg:11, speed:1.8, radius:16, color:'#b0b0b0', xp:13},
+        {name:'Orc', hp:55, dmg:14, speed:1.4, radius:22, color:'#5d7a4a', xp:16},
+      ];
+      const t = types.find(t => t.name === type) || types[0];
+      this.radius = t.radius * (0.9 + Math.random()*0.2);
+      this.hp = t.hp * scale * (0.8 + Math.random()*0.4);
+      this.maxHp = this.hp;
+      this.damage = t.dmg * scale * (0.8 + Math.random()*0.3);
+      this.speed = t.speed * (0.8 + Math.random()*0.3) * Math.min(scale, 1.6);
+      this.xpReward = t.xp * scale * (0.7 + Math.random()*0.5);
+      this.color = t.color;
+      this.name = t.name;
+    }
+    this.attackCooldown = 0;
+    this.deathTimer = 0;
   }
-
-  return possible[
-    Math.floor(Math.random()*possible.length)
-  ];
-
+  takeDamage(dmg, crit=false) {
+    this.hp -= dmg;
+    this.hitFlash = 8;
+    if (this.hp <= 0) { this.hp = 0; this.alive = false; }
+    return crit;
+  }
+  update() {
+    if (!this.alive) return;
+    if (this.hitFlash > 0) this.hitFlash--;
+    if (this.attackCooldown > 0) this.attackCooldown -= 1/60;
+    // chase player
+    const p = G.player;
+    if (!p || !p.alive) return;
+    const angle = Math.atan2(p.y - this.y, p.x - this.x);
+    const d = dist(this, p);
+    if (d > 20) {
+      this.x += Math.cos(angle) * this.speed * 0.8;
+      this.y += Math.sin(angle) * this.speed * 0.8;
+    }
+    if (d < this.radius + p.radius && this.attackCooldown <= 0) {
+      p.takeDamage(this.damage * 0.5);
+      this.attackCooldown = 1.0;
+    }
+    // push out of walls
+    this.x = clamp(this.x, 20, W-20);
+    this.y = clamp(this.y, 20, H-20);
+  }
 }
 
-function spawnMonster(){
-
-  const area =
-    areas[Math.floor(Math.random()*areas.length)];
-
-  const type =
-    getMonsterForArea(area);
-
-  const level =
-    Math.max(
-      1,
-      Math.floor(
-        area.min+
-        Math.random()*
-        (area.max-area.min+1)
-      )
-    );
-
-  const scale =
-    1+(level-1)*0.11;
-
-  enemies.push({
-
-    x:
-      area.x+
-      80+
-      Math.random()*
-      Math.max(100,area.w-160),
-
-    y:
-      area.y+
-      80+
-      Math.random()*
-      Math.max(100,area.h-160),
-
-    radius:
-      type.name==="Dragon"?35:15,
-
-    name:type.name,
-
-    color:type.color,
-
-    level:level,
-
-    hp:Math.floor(type.hp*scale),
-
-    maxHp:Math.floor(type.hp*scale),
-
-    atk:Math.floor(type.atk*scale),
-
-    exp:Math.floor(type.exp*scale),
-
-    gold:Math.floor(
-      type.gold*
-      (0.7+Math.random()*0.8)
-    ),
-
-    aggro:false,
-
-    boss:false
-
-  });
-
+// ---------- SPAWNING ----------
+function spawnEnemy() {
+  if (!G.player) return;
+  const p = G.player;
+  const angle = rand(0, Math.PI*2);
+  const dist = rand(200, 450);
+  const x = clamp(p.x + Math.cos(angle)*dist, 30, W-30);
+  const y = clamp(p.y + Math.sin(angle)*dist, 30, H-30);
+  const types = ['Slime','Goblin','Zombie','Wolf','Skeleton','Orc'];
+  const type = types[randI(0, types.length-1)];
+  const e = new Enemy(x, y, type, false);
+  G.enemies.push(e);
 }
 
-function spawnInitialMonsters(){
-
-  for(let i=0;i<30;i++){
-
-    spawnMonster();
-
+function spawnBoss() {
+  if (!G.player) return;
+  const p = G.player;
+  const angle = rand(0, Math.PI*2);
+  const dist = 250;
+  const x = clamp(p.x + Math.cos(angle)*dist, 50, W-50);
+  const y = clamp(p.y + Math.sin(angle)*dist, 50, H-50);
+  const boss = new Enemy(x, y, 'Boss', true);
+  // scale boss to wave
+  const sc = 1 + (G.wave-1)*0.1;
+  boss.hp *= sc;
+  boss.maxHp = boss.hp;
+  boss.damage *= sc;
+  boss.speed *= Math.min(sc, 1.8);
+  boss.xpReward *= sc;
+  G.enemies.push(boss);
+  // boss spawn effect
+  for (let i=0; i<30; i++) {
+    const a = rand(0, Math.PI*2);
+    const sp = rand(2, 8);
+    G.particles.push({x: boss.x, y: boss.y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life: 30, maxLife: 30, color: '#ff6644', size: rand(4,10)});
   }
-
 }
 
-/* =========================================================
-   BOSS
-========================================================= */
-
-function spawnBoss(area){
-
-  if(area.min<15)return;
-
-  if(bossSpawned[area.name])return;
-
-  bossSpawned[area.name] = true;
-
-  let type = monsterTypes[monsterTypes.length-1];
-
-  if(area.min<30){
-    type = monsterTypes[2];
-  }
-  else if(area.min<55){
-    type = monsterTypes[4];
-  }
-  else if(area.min<75){
-    type = monsterTypes[6];
-  }
-
-  enemies.push({
-
-    x:area.x+area.w/2,
-
-    y:area.y+area.h/2,
-
-    radius:42,
-
-    name:area.name+" Guardian",
-
-    color:"
+// ---------- SKILLS ----------
+const skillDefs = [
+  { id: 'double', name: 'Double Shot', desc: 'Shoot 2 bullets', apply: () => { G.player.bulletCount = 2; } },
+  { id: 'triple', name: 'Triple Shot', desc: 'Shoot 3 spread', apply: () => { G.player.bulletCount = 3; } },
+  { id: 'pierce', name: 'Piercing Bullet', desc: '+1 pierce', apply: () => { G.player.pierce += 1; } },
+  { id: 'explode', name: 'Explosive Bullet', desc: 'Small explosion', apply: () => { G.player.explode += 0.3; } },
+  { id: 'fire', name: 'Fire Bullet', desc: 'Burn enemies', apply: () => { G.player.burnMult += 0.2; } },
+  { id: 'critMaster', name: 'Critical Mastery', desc: '+8% crit', apply: () => { G.player.critChance += 0.08; } },
+  { id: 'rapid', name: 'Rapid Fire', desc: '+25% fire rate', apply: () => { G.player.fireRate *= 1.25; } },
+  { id: 'vampire', name: 'Vampire', desc: 'Heal on kill', apply: () => { G.player.vampire += 3; } },
+  { id: 'shield', name: 'Shield', desc: '+20 shield HP', apply: () => { G.player.shieldHP += 20; } },
+  { id: 'drone', name: 'Drone', desc: 'Auto-shoot drone', apply: () => { if (!G.player.drone) G.player.drone = {x: G.player.x+40, y: G.player.y}; } },
+];
+function showSkillChoices() {
+  if (G.state === 'gameover' || G.state === 'menu') return;
+  G.state = 'levelup';
+  const panel = document.getElementById('skill-panel');
+  panel.style.display = 'flex';
+  const container = document.getElementById('skillOptions');
+  container.innerHTML = '';
+  const shuffled = [...skillDefs].sort(() => Math.random() - 0.5);
+  const chosen = shuffled.slice(0, 3);
+  chosen.forEach(skill => {
+    const div = document.createElement('div');
+    div.className = 'skill-card';
+    div.innerHTML = `<div>${skill.name}</div><div class="skill-desc">${skill.desc}</div>`;
+    div.addEventListener('click', () => {
+      skill.apply();
+      panel.style.display = 'none';
+      G.state = 'playing';
+      // level up particles
+      for (let i=0; i<25; i++) {
+        const a = rand(0, Math.PI*2);
+        const sp = rand(2, 10);
+        G.particles.push({x: G.playe
